@@ -1,0 +1,514 @@
+{% extends "base.html" %}
+{% block title %}Kisan Shop — Pesticides & Farm Supplies{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── SHOP PAGE ── */
+.shop-hero{background:linear-gradient(135deg,var(--g9),var(--g7));padding:3.5rem 1.5rem 2.5rem;text-align:center;margin-top:62px}
+.shop-hero h1{font-family:'Fraunces',serif;color:#fff;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;margin-bottom:.5rem}
+.shop-hero p{color:rgba(255,255,255,.7);font-size:.95rem;max-width:500px;margin:0 auto 1.5rem}
+.shop-search-bar{display:flex;max-width:480px;margin:0 auto;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);border-radius:12px;overflow:hidden}
+.shop-search-bar input{flex:1;background:transparent;border:none;padding:.7rem 1rem;color:#fff;font-family:'Outfit',sans-serif;font-size:.9rem;outline:none}
+.shop-search-bar input::placeholder{color:rgba(255,255,255,.5)}
+.shop-search-bar button{background:var(--g4);border:none;padding:.7rem 1.1rem;color:var(--g9);cursor:pointer;font-size:1.1rem;transition:background .2s}
+.shop-search-bar button:hover{background:var(--g3)}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:.5rem;overflow-x:auto;padding:1rem 0;scrollbar-width:none;flex-wrap:wrap}
+.filter-bar::-webkit-scrollbar{display:none}
+.filter-btn{padding:.4rem 1rem;border-radius:20px;border:1.5px solid var(--g2);background:var(--warm);font-size:.8rem;font-weight:600;color:var(--txt2);cursor:pointer;white-space:nowrap;transition:all .2s;font-family:'Outfit',sans-serif}
+.filter-btn:hover,.filter-btn.active{background:var(--g5);color:#fff;border-color:var(--g5)}
+
+/* ── PRODUCTS GRID ── */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.2rem;margin-top:.5rem}
+.product-card{background:var(--warm);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:all .25s;cursor:pointer}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(20,70,25,.12);border-color:var(--g3)}
+.product-img{height:160px;display:flex;align-items:center;justify-content:center;font-size:4rem;background:linear-gradient(135deg,var(--g1),var(--cream));position:relative}
+.product-badge{position:absolute;top:10px;right:10px;background:var(--g5);color:#fff;padding:.2rem .6rem;border-radius:20px;font-size:.7rem;font-weight:700}
+.product-badge.offer{background:#e67e22}
+.product-badge.new{background:#8e44ad}
+.product-body{padding:1rem}
+.product-category{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g5);margin-bottom:.3rem}
+.product-name{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--g9);margin-bottom:.25rem;line-height:1.3}
+.product-desc{font-size:.78rem;color:var(--txt3);line-height:1.5;margin-bottom:.8rem}
+.product-price-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.product-price{font-size:1.1rem;font-weight:700;color:var(--g7);font-family:'Fraunces',serif}
+.product-mrp{font-size:.78rem;color:var(--txt3);text-decoration:line-through;margin-left:4px}
+.product-discount{background:#fef3c7;color:#92400e;font-size:.72rem;font-weight:700;padding:.15rem .5rem;border-radius:6px}
+.add-to-cart{width:100%;padding:.55rem;background:var(--g5);color:#fff;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s}
+.add-to-cart:hover{background:var(--g6)}
+.add-to-cart.added{background:var(--g7)}
+.product-rating{display:flex;align-items:center;gap:3px;font-size:.75rem;color:var(--txt3);margin-bottom:.6rem}
+.product-rating .stars{color:#f59e0b}
+
+/* ── CART SIDEBAR / FLOATING ── */
+.cart-fab{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--g6);color:#fff;width:56px;height:56px;border-radius:50%;border:none;font-size:1.4rem;cursor:pointer;box-shadow:0 4px 20px rgba(45,122,55,.4);z-index:300;display:flex;align-items:center;justify-content:center;transition:all .22s}
+.cart-fab:hover{background:var(--g7);transform:scale(1.07)}
+.cart-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;width:20px;height:20px;border-radius:50%;font-size:.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;display:none}
+.cart-sidebar{position:fixed;right:0;top:0;bottom:0;width:340px;background:var(--warm);border-left:1px solid var(--border);box-shadow:-8px 0 32px rgba(0,0,0,.12);z-index:500;transform:translateX(100%);transition:transform .3s ease;display:flex;flex-direction:column}
+.cart-sidebar.open{transform:translateX(0)}
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:499;display:none}
+.cart-overlay.show{display:block}
+.cart-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cart-header h3{font-family:'Fraunces',serif;font-size:1.1rem;color:var(--g9)}
+.cart-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--txt2)}
+.cart-items{flex:1;overflow-y:auto;padding:1rem}
+.cart-empty{text-align:center;padding:3rem 1rem;color:var(--txt3)}
+.cart-empty-icon{font-size:3rem;display:block;margin-bottom:.8rem}
+.cart-item{display:flex;gap:.8rem;padding:.8rem 0;border-bottom:1px solid var(--border)}
+.cart-item-icon{width:44px;height:44px;background:var(--g1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+.cart-item-info{flex:1}
+.cart-item-name{font-size:.85rem;font-weight:600;color:var(--g9);margin-bottom:.2rem}
+.cart-item-price{font-size:.82rem;color:var(--g6);font-weight:700}
+.cart-item-controls{display:flex;align-items:center;gap:.4rem;margin-top:.3rem}
+.qty-btn{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--g2);background:transparent;cursor:pointer;font-size:.85rem;font-weight:700;color:var(--g6);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.qty-btn:hover{background:var(--g5);color:#fff;border-color:var(--g5)}
+.qty-display{font-size:.85rem;font-weight:700;color:var(--g9);min-width:20px;text-align:center}
+.remove-item{background:none;border:none;color:#ef4444;cursor:pointer;font-size:.8rem;margin-left:auto;padding:.2rem .4rem;border-radius:4px}
+.remove-item:hover{background:#fef2f2}
+.cart-footer{padding:1rem 1.5rem;border-top:1px solid var(--border)}
+.cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem}
+.cart-total-label{font-size:.88rem;color:var(--txt2);font-weight:600}
+.cart-total-price{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--g7)}
+.checkout-btn{width:100%;padding:.75rem;background:var(--g5);color:#fff;border:none;border-radius:11px;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:background .2s;box-shadow:0 4px 14px rgba(61,158,71,.3)}
+.checkout-btn:hover{background:var(--g6)}
+
+/* ── CHECKOUT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.show{display:flex}
+.modal{background:var(--warm);border-radius:20px;padding:2rem;width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
+.modal h3{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--g9);margin-bottom:1.2rem}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:.8rem;font-weight:600;color:var(--txt2);margin-bottom:.35rem}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:.65rem .9rem;border:1.5px solid var(--g2);border-radius:9px;font-family:'Outfit',sans-serif;font-size:.88rem;background:var(--cream);color:var(--txt);outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--g5)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.order-summary{background:var(--g1);border:1px solid var(--g2);border-radius:12px;padding:1rem;margin:.8rem 0}
+.order-summary-title{font-size:.8rem;font-weight:700;color:var(--g7);margin-bottom:.6rem}
+.order-line{display:flex;justify-content:space-between;font-size:.82rem;color:var(--txt2);margin-bottom:.3rem}
+.order-line.total{font-weight:700;color:var(--g7);border-top:1px solid var(--g2);padding-top:.4rem;margin-top:.3rem}
+.modal-btns{display:flex;gap:.6rem;margin-top:1rem}
+.modal-btn{flex:1;padding:.65rem;border-radius:10px;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;border:none;cursor:pointer}
+.modal-btn.secondary{background:var(--cream);color:var(--txt2);border:1.5px solid var(--g2)}
+.modal-btn.primary{background:var(--g5);color:#fff}
+
+/* ORDER SUCCESS */
+.order-success{text-align:center;padding:1rem 0}
+.order-success-icon{font-size:4rem;display:block;margin-bottom:1rem}
+.order-success h3{font-family:'Fraunces',serif;font-size:1.4rem;color:var(--g9);margin-bottom:.4rem}
+.order-success p{color:var(--txt2);font-size:.88rem;line-height:1.6}
+.order-id{background:var(--g1);border:1px solid var(--g2);border-radius:8px;padding:.5rem 1rem;display:inline-block;font-weight:700;color:var(--g7);margin:.8rem 0;font-size:.95rem}
+
+@media(max-width:768px){.cart-sidebar{width:100%}.products-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.product-img{height:120px;font-size:2.5rem}}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+
+<!-- CART SIDEBAR -->
+<div class="cart-sidebar" id="cart-sidebar">
+  <div class="cart-header">
+    <h3>🛒 आपकी Cart</h3>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items">
+    <div class="cart-empty">
+      <span class="cart-empty-icon">🛒</span>
+      <p>Cart खाली है।<br>Products जोड़ें!</p>
+    </div>
+  </div>
+  <div class="cart-footer" id="cart-footer" style="display:none">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-price" id="cart-total">₹0</span>
+    </div>
+    <div style="font-size:.72rem;color:var(--txt3);margin-bottom:.7rem">🚚 Free delivery on orders above ₹499</div>
+    <button class="checkout-btn" onclick="openCheckout()">🛒 Checkout करें</button>
+  </div>
+</div>
+
+<!-- CART FAB -->
+<button class="cart-fab" onclick="openCart()">
+  🛒
+  <span class="cart-badge" id="cart-badge">0</span>
+</button>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkout-modal">
+  <div class="modal" id="checkout-content">
+    <h3>📦 Order Details भरें</h3>
+    <div class="form-row">
+      <div class="form-group"><label>पूरा नाम *</label><input id="ord-name" placeholder="Ramesh Kumar" required></div>
+      <div class="form-group"><label>Mobile *</label><input id="ord-phone" placeholder="98765 43210" required></div>
+    </div>
+    <div class="form-group"><label>पूरा पता *</label><textarea id="ord-addr" placeholder="गांव/मोहल्ला, जिला, राज्य..." style="height:70px" required></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Pincode *</label><input id="ord-pin" placeholder="462001" maxlength="6" required></div>
+      <div class="form-group"><label>Payment</label>
+        <select id="ord-payment">
+          <option value="cod">Cash on Delivery 💵</option>
+          <option value="upi">UPI / PhonePe 📱</option>
+          <option value="card">Debit/Credit Card 💳</option>
+        </select>
+      </div>
+    </div>
+    <div class="order-summary" id="order-summary"></div>
+    <div class="modal-btns">
+      <button class="modal-btn secondary" onclick="closeCheckout()">← Back</button>
+      <button class="modal-btn primary" onclick="placeOrder()">✅ Order Place करें</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHOP HERO -->
+<div class="shop-hero">
+  <div class="section-tag" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.25);color:#fff">🛒 Kisan Shop</div>
+  <h1>किसान की दुकान</h1>
+  <p>सर्वोत्तम कीटनाशक, फफूंदनाशक और खाद — सीधे आपके खेत तक<br>Best pesticides, fungicides & fertilizers delivered to your farm</p>
+  <div class="shop-search-bar">
+    <input type="text" id="search-input" placeholder="खोजें — gehu, tomato, pesticide..." oninput="filterProducts()">
+    <button>🔍</button>
+  </div>
+</div>
+
+<!-- MAIN SHOP -->
+<div class="page-wrap" style="padding-top:2rem">
+  <div class="container">
+
+    <!-- DETECTION RECOMMENDATION BANNER (shown if arrived from disease scan) -->
+    <div id="detection-banner" style="display:none;background:linear-gradient(135deg,#fef3c7,#fff7ed);border:1.5px solid #f59e0b;border-radius:14px;padding:1rem 1.3rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap">
+      <span style="font-size:1.5rem">🔬</span>
+      <div style="flex:1">
+        <div style="font-weight:700;color:#92400e;font-size:.88rem">Detection-Based Recommendation</div>
+        <div id="detection-disease-name" style="font-size:.8rem;color:#b45309">Showing pesticides recommended for your detected disease</div>
+      </div>
+      <button onclick="clearDetectionFilter()" style="background:#f59e0b;color:#fff;border:none;padding:.3rem .8rem;border-radius:8px;font-size:.78rem;cursor:pointer;font-weight:600">✕ Clear Filter</button>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-btn active" data-cat="all" onclick="filterByCategory(this,'all')">🌿 All Products</button>
+      <button class="filter-btn" data-cat="disease" onclick="filterByCategory(this,'disease')" style="border-color:#ef4444;color:#ef4444" title="Recommended based on disease detection">🔬 Disease Linked</button>
+      <button class="filter-btn" data-cat="fungicide" onclick="filterByCategory(this,'fungicide')">🍄 Fungicide (फफूंदनाशक)</button>
+      <button class="filter-btn" data-cat="insecticide" onclick="filterByCategory(this,'insecticide')">🐛 Insecticide (कीटनाशक)</button>
+      <button class="filter-btn" data-cat="fertilizer" onclick="filterByCategory(this,'fertilizer')">🌱 Fertilizer (खाद)</button>
+      <button class="filter-btn" data-cat="herbicide" onclick="filterByCategory(this,'herbicide')">🌾 Herbicide (खरपतवार)</button>
+      <button class="filter-btn" data-cat="bio" onclick="filterByCategory(this,'bio')">🍃 Bio / Organic</button>
+      <button class="filter-btn" data-cat="seed" onclick="filterByCategory(this,'seed')">🌰 Seeds (बीज)</button>
+    </div>
+
+    <!-- PRODUCTS GRID -->
+    <div class="products-grid" id="products-grid"></div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── PRODUCT DATA ──
+const PRODUCTS = [
+  {id:1, name:"Mancozeb 75 WP", hindi:"मैन्कोज़ेब", icon:"🍄", category:"fungicide", price:180, mrp:220, discount:18, desc:"धान, टमाटर, आलू में ब्लाइट रोग के लिए सर्वोत्तम। For blight in rice, tomato, potato.", unit:"250g", rating:4.5, reviews:128, badge:"Bestseller", disease:"Tomato Early Blight,Potato Late Blight,Rice Leaf Blight"},
+  {id:2, name:"Imidacloprid 17.8 SL", hindi:"इमिडाक्लोप्रिड", icon:"🐛", category:"insecticide", price:215, mrp:260, discount:17, desc:"सफेद मक्खी, एफिड, थ्रिप्स के लिए। For whitefly, aphids, thrips control.", unit:"100ml", rating:4.3, reviews:95, badge:null, disease:""},
+  {id:3, name:"Chlorpyrifos 20 EC", hindi:"क्लोरपाइरीफोस", icon:"🐜", category:"insecticide", price:145, mrp:175, discount:17, desc:"चूसने वाले कीट, तना छेदक के लिए प्रभावी। Effective for sucking pests & stem borer.", unit:"500ml", rating:4.2, reviews:72, badge:null, disease:""},
+  {id:4, name:"DAP Fertilizer", hindi:"डीएपी खाद", icon:"🌱", category:"fertilizer", price:1350, mrp:1450, discount:7, desc:"Phosphorus व Nitrogen का सर्वोत्तम स्रोत। बुआई के समय उपयोग करें। Best source of P & N.", unit:"50 kg", rating:4.7, reviews:203, badge:"Most Popular", disease:""},
+  {id:5, name:"Urea (46% N)", hindi:"यूरिया", icon:"🧪", category:"fertilizer", price:280, mrp:300, discount:7, desc:"नाइट्रोजन की पूर्ति के लिए। हरे पत्तों की बढ़वार के लिए। For nitrogen supply & leaf growth.", unit:"10 kg", rating:4.6, reviews:187, badge:null, disease:""},
+  {id:6, name:"Tricyclazole 75 WP", hindi:"ट्राइसाइक्लेज़ोल", icon:"🌾", category:"fungicide", price:320, mrp:380, discount:16, desc:"धान के ब्लास्ट रोग के लिए सबसे प्रभावी फफूंदनाशक। Most effective for rice blast.", unit:"100g", rating:4.4, reviews:89, badge:null, disease:"Rice Blast,Rice Brown Spot"},
+  {id:7, name:"Neem Oil (Bio)", hindi:"नीम का तेल", icon:"🍃", category:"bio", price:195, mrp:240, discount:19, desc:"जैविक कीट नियंत्रण। 100% प्राकृतिक, सब्जियों के लिए सुरक्षित। 100% organic, safe for vegetables.", unit:"500ml", rating:4.6, reviews:156, badge:"Organic", disease:""},
+  {id:8, name:"Glyphosate 41 SL", hindi:"ग्लाइफोसेट", icon:"🌿", category:"herbicide", price:265, mrp:300, discount:12, desc:"चौड़ी पत्ती व घास वाले खरपतवार के लिए। For broad-leaf & grassy weed control.", unit:"1 liter", rating:4.1, reviews:61, badge:null, disease:""},
+  {id:9, name:"Carbendazim 50 WP", hindi:"कार्बेन्डाजिम", icon:"🔵", category:"fungicide", price:155, mrp:190, discount:18, desc:"पाउडरी मिल्ड्यू, डाई-बैक रोग के लिए। For powdery mildew & die-back disease.", unit:"100g", rating:4.2, reviews:77, badge:null, disease:"Powdery Mildew,Squash Powdery Mildew,Grape Black Rot"},
+  {id:10, name:"Hybrid Tomato Seeds", hindi:"हाइब्रिड टमाटर बीज", icon:"🍅", category:"seed", price:320, mrp:380, discount:16, desc:"उच्च उपज, रोग प्रतिरोधक। High yield, disease-resistant hybrid variety.", unit:"10g (500 seeds)", rating:4.8, reviews:214, badge:"New", disease:""},
+  {id:11, name:"MOP (Potash)", hindi:"पोटाश खाद", icon:"🟤", category:"fertilizer", price:520, mrp:580, discount:10, desc:"पोटेशियम की पूर्ति। रोग प्रतिरोधक क्षमता बढ़ाए। Improves disease resistance & fruit quality.", unit:"25 kg", rating:4.5, reviews:93, badge:null, disease:""},
+  {id:12, name:"Trichoderma Viride", hindi:"ट्राइकोडर्मा", icon:"🌍", category:"bio", price:175, mrp:210, discount:17, desc:"मिट्टी जनित रोगों से बचाव। जैविक फफूंदनाशक। Soil-borne disease prevention. Bio-fungicide.", unit:"250g", rating:4.3, reviews:68, badge:"Organic", disease:""},
+  {id:13, name:"Imidacloprid 70 WG (Seed Treatment)", hindi:"इमिडाक्लोप्रिड (बीज उपचार)", icon:"🌰", category:"insecticide", price:480, mrp:550, discount:13, desc:"बीज उपचार के लिए। शुरुआती कीट नियंत्रण। For seed treatment & early insect control.", unit:"70g", rating:4.4, reviews:52, badge:null, disease:""},
+  {id:14, name:"Wheat Seeds (HD-2967)", hindi:"गेहूं बीज HD-2967", icon:"🌾", category:"seed", price:650, mrp:700, discount:7, desc:"उत्तर भारत की सबसे लोकप्रिय गेहूं किस्म। Most popular wheat variety in North India.", unit:"10 kg", rating:4.9, reviews:342, badge:"Bestseller", disease:""},
+  {id:15, name:"Vermicompost", hindi:"वर्मीकम्पोस्ट", icon:"🪱", category:"bio", price:350, mrp:400, discount:13, desc:"मिट्टी की उर्वरा शक्ति बढ़ाएं। 100% जैविक खाद। Boost soil fertility. 100% organic.", unit:"10 kg", rating:4.7, reviews:128, badge:"Organic", disease:""},
+  {id:16, name:"Propiconazole 25 EC", hindi:"प्रोपिकोनाजोल", icon:"🟡", category:"fungicide", price:290, mrp:340, discount:15, desc:"गेहूं की जंग व पत्ती झुलसा रोग के लिए। For wheat rust & leaf blight disease.", unit:"100ml", rating:4.3, reviews:81, badge:null, disease:"Wheat Rust,Corn Common Rust,Apple Rust"},
+  {id:17, name:"Metalaxyl + Mancozeb (Ridomil Gold)", hindi:"मेटालैक्सिल + मैन्कोज़ेब", icon:"🧬", category:"fungicide", price:420, mrp:490, discount:14, desc:"आलू-टमाटर की लेट ब्लाइट के लिए सर्वश्रेष्ठ। Best for late blight in potato & tomato.", unit:"100g", rating:4.6, reviews:110, badge:"Recommended", disease:"Potato Late Blight,Tomato Late Blight"},
+  {id:18, name:"Copper Oxychloride 50 WP", hindi:"कॉपर ऑक्सीक्लोराइड", icon:"🟠", category:"fungicide", price:185, mrp:220, discount:16, desc:"जीवाणु व फफूंद दोनों रोगों के लिए। For bacterial & fungal diseases both.", unit:"250g", rating:4.2, reviews:65, badge:null, disease:"Bacterial Blight,Apple Scab,Peach Bacterial Spot"},
+  {id:19, name:"Emamectin Benzoate 5 SG", hindi:"एमामेक्टिन बेंजोएट", icon:"🐝", category:"insecticide", price:380, mrp:440, discount:14, desc:"फल छेदक, पत्ती लपेटक कीट के लिए अत्यंत प्रभावी। For fruit borer & leaf folder.", unit:"100g", rating:4.5, reviews:88, badge:null, disease:""},
+  {id:20, name:"Pendimethalin 30 EC", hindi:"पेंडीमेथालिन", icon:"🌱", category:"herbicide", price:195, mrp:235, discount:17, desc:"बुआई से पहले या बाद में खरपतवार नाशक। Pre/post-emergence weed control.", unit:"1 liter", rating:4.1, reviews:58, badge:null, disease:""},
+  {id:21, name:"Hexaconazole 5 SC", hindi:"हेक्साकोनाजोल", icon:"🍎", category:"fungicide", price:245, mrp:290, discount:15, desc:"Apple scab, powdery mildew व एन्थ्रेकनोज के लिए। For apple scab, mildew & anthracnose.", unit:"100ml", rating:4.3, reviews:74, badge:null, disease:"Apple Scab,Cherry Powdery Mildew,Grape Black Rot"},
+  {id:22, name:"Lambda Cyhalothrin 5 EC", hindi:"लैम्बडा सायहेलोथ्रिन", icon:"🦟", category:"insecticide", price:175, mrp:210, discount:17, desc:"सभी प्रकार के कीटों पर असरदार। Broad-spectrum insecticide for all pests.", unit:"250ml", rating:4.2, reviews:83, badge:null, disease:""},
+  {id:23, name:"Azoxystrobin 23 SC (Amistar)", hindi:"एजोक्सीस्ट्रोबिन", icon:"⭐", category:"fungicide", price:560, mrp:640, discount:13, desc:"सभी फफूंद रोगों के लिए सर्वश्रेष्ठ systemic फफूंदनाशक। Best systemic fungicide.", unit:"100ml", rating:4.7, reviews:136, badge:"Premium", disease:"Rice Brown Spot,Corn Gray Leaf Spot,Apple Black Rot"},
+  {id:24, name:"Paddy Seeds (Pusa 1121)", hindi:"धान बीज पूसा 1121", icon:"🌾", category:"seed", price:580, mrp:640, discount:9, desc:"बासमती की सर्वश्रेष्ठ किस्म। Best Basmati rice variety, high export demand.", unit:"5 kg", rating:4.8, reviews:178, badge:"Export Quality", disease:""},
+  {id:25, name:"Thiamethoxam 25 WG", hindi:"थायमेथोक्सेम", icon:"🐞", category:"insecticide", price:295, mrp:350, discount:16, desc:"जड़ से तने तक सुरक्षा। Systemic action from roots to leaves.", unit:"100g", rating:4.4, reviews:92, badge:null, disease:""},
+  {id:26, name:"Tebuconazole 25.9 EC", hindi:"टेब्यूकोनाजोल", icon:"🔴", category:"fungicide", price:340, mrp:400, discount:15, desc:"गेहूं की स्मट, करनाल बंट रोग के लिए। For wheat smut, Karnal bunt disease.", unit:"100ml", rating:4.3, reviews:62, badge:null, disease:"Wheat Loose Smut,Corn Common Smut"},
+  {id:27, name:"Humic Acid (Liquid)", hindi:"ह्यूमिक एसिड", icon:"💧", category:"fertilizer", price:285, mrp:340, discount:16, desc:"मिट्टी की संरचना और पोषक तत्व अवशोषण सुधारे। Improves soil structure & nutrient uptake.", unit:"500ml", rating:4.5, reviews:104, badge:"New", disease:""},
+  {id:28, name:"Spinosad 45 SC", hindi:"स्पिनोसैड", icon:"🌿", category:"bio", price:420, mrp:490, discount:14, desc:"जैविक थ्रिप्स व फल मक्खी नाशक। Bio-insecticide for thrips & fruit fly.", unit:"100ml", rating:4.4, reviews:57, badge:"Organic", disease:""},
+  {id:29, name:"Hybrid Brinjal Seeds", hindi:"हाइब्रिड बैंगन बीज", icon:"🍆", category:"seed", price:265, mrp:320, discount:17, desc:"उच्च उपज, कम कीट समस्या। High yield variety with fewer pest issues.", unit:"5g (200 seeds)", rating:4.5, reviews:89, badge:null, disease:""},
+  {id:30, name:"Zinc Sulphate 21%", hindi:"जिंक सल्फेट", icon:"🟩", category:"fertilizer", price:165, mrp:195, discount:15, desc:"जिंक की कमी दूर करे। पत्तियों पर सफेद धारियां हों तो उपयोग करें। Corrects zinc deficiency.", unit:"1 kg", rating:4.6, reviews:115, badge:null, disease:""},
+  {id:31, name:"Kasugamycin 3 SL", hindi:"कसुगामाइसिन", icon:"🩺", category:"fungicide", price:370, mrp:430, discount:14, desc:"धान के ब्लास्ट व जीवाणु झुलसा के लिए। For rice blast & bacterial blight.", unit:"100ml", rating:4.3, reviews:69, badge:null, disease:"Rice Blast,Bacterial Blight"},
+  {id:32, name:"Beauveria Bassiana (Bio)", hindi:"ब्यूवेरिया बेसियाना", icon:"🦠", category:"bio", price:245, mrp:290, discount:15, desc:"जैविक कीट नियंत्रण। Whitefly, thrips, mealybug को नष्ट करे। Bio-control for whitefly & thrips.", unit:"250g", rating:4.3, reviews:48, badge:"Organic", disease:""},
+  {id:33, name:"Sulphur 80 WG (Kumulus)", hindi:"सल्फर", icon:"🟨", category:"fungicide", price:135, mrp:165, discount:18, desc:"पाउडरी मिल्ड्यू, माइट के लिए सबसे सस्ता प्रभावी उपाय। Cheap & effective for powdery mildew.", unit:"500g", rating:4.4, reviews:143, badge:"Economy", disease:"Powdery Mildew,Spider Mites"},
+  {id:34, name:"Hybrid Chilli Seeds", hindi:"हाइब्रिड मिर्च बीज", icon:"🌶️", category:"seed", price:295, mrp:350, discount:16, desc:"तीखी व अधिक उपज वाली किस्म। Hot variety with high yield & disease resistance.", unit:"5g", rating:4.6, reviews:132, badge:"Bestseller", disease:""},
+  {id:35, name:"Micronutrient Mix (Boron+Zinc+Mn)", hindi:"सूक्ष्म पोषक तत्व मिश्रण", icon:"🔬", category:"fertilizer", price:220, mrp:265, discount:17, desc:"सभी ज़रूरी सूक्ष्म तत्वों की कमी एक साथ दूर करें। All micronutrient deficiency corrector.", unit:"500g", rating:4.5, reviews:97, badge:"New", disease:""},
+  {id:36, name:"Isoprothiolane 40 EC", hindi:"आइसोप्रोथियोलेन", icon:"🌾", category:"fungicide", price:310, mrp:365, discount:15, desc:"धान के ब्लास्ट व भूरी धब्बा रोग के लिए। For rice blast & brown spot disease.", unit:"500ml", rating:4.4, reviews:76, badge:null, disease:"Rice Blast,Rice Brown Spot"}
+];
+
+let cart = {};
+let currentFilter = 'all';
+let searchTerm = '';
+
+// ── RENDER PRODUCTS ──
+function renderProducts(){
+  const grid = document.getElementById('products-grid');
+  let filtered = PRODUCTS.filter(p=>{
+    const matchCat = currentFilter==='all' || p.category===currentFilter ||
+      (currentFilter==='disease' && p.disease && p.disease.length > 0);
+    const matchSearch = !searchTerm ||
+      p.name.toLowerCase().includes(searchTerm) ||
+      p.hindi.includes(searchTerm) ||
+      p.desc.toLowerCase().includes(searchTerm) ||
+      p.category.includes(searchTerm) ||
+      (p.disease && p.disease.toLowerCase().includes(searchTerm));
+    return matchCat && matchSearch;
+  });
+
+  if(!filtered.length){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--txt3)"><div style="font-size:3rem">🔍</div><p>कोई product नहीं मिला। दूसरा keyword try करें।</p></div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p=>{
+    const inCart = cart[p.id] && cart[p.id].qty > 0;
+    const stars = '⭐'.repeat(Math.round(p.rating));
+    const diseaseBadge = p.disease ? `<div style="position:absolute;bottom:8px;left:8px;background:rgba(239,68,68,.9);color:#fff;padding:.15rem .5rem;border-radius:10px;font-size:.65rem;font-weight:700">🔬 Disease Linked</div>` : '';
+    return `
+    <div class="product-card" data-id="${p.id}">
+      <div class="product-img">
+        ${p.icon}
+        ${p.badge ? `<span class="product-badge ${p.badge==='Organic'?'new':p.badge==='New'?'new':''}">${p.badge}</span>` : ''}
+        ${diseaseBadge}
+      </div>
+      <div class="product-body">
+        <div class="product-category">${p.category.toUpperCase()}</div>
+        <div class="product-name">${p.name}</div>
+        <div style="font-size:.75rem;color:var(--g5);margin-bottom:.2rem">${p.hindi} • ${p.unit}</div>
+        <div class="product-rating"><span class="stars">${stars}</span> <span>${p.rating} (${p.reviews})</span></div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-price-row">
+          <div>
+            <span class="product-price">₹${p.price}</span>
+            <span class="product-mrp">₹${p.mrp}</span>
+          </div>
+          <span class="product-discount">-${p.discount}%</span>
+        </div>
+        <button class="add-to-cart ${inCart?'added':''}" onclick="addToCart(${p.id},event)">
+          ${inCart ? '✅ Added to Cart' : '🛒 Cart में जोड़ें'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── FILTER ──
+function filterByCategory(btn, cat){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = cat;
+  renderProducts();
+}
+function filterProducts(){
+  searchTerm = document.getElementById('search-input').value.toLowerCase();
+  renderProducts();
+}
+
+// ── CART ──
+function addToCart(id, e){
+  e && e.stopPropagation();
+  const prod = PRODUCTS.find(p=>p.id===id);
+  if(!prod) return;
+  if(cart[id]){
+    cart[id].qty++;
+  } else {
+    cart[id] = {product: prod, qty: 1};
+  }
+  updateCartUI();
+  renderProducts();
+  // Show cart briefly
+  openCart();
+}
+
+function updateCartQty(id, delta){
+  if(!cart[id]) return;
+  cart[id].qty += delta;
+  if(cart[id].qty <= 0) delete cart[id];
+  updateCartUI();
+  renderProducts();
+}
+
+function removeFromCart(id){
+  delete cart[id];
+  updateCartUI();
+  renderProducts();
+}
+
+function updateCartUI(){
+  const items = Object.values(cart);
+  const totalQty = items.reduce((a,b)=>a+b.qty,0);
+  const totalPrice = items.reduce((a,b)=>a+b.product.price*b.qty,0);
+
+  // Badge
+  const badge = document.getElementById('cart-badge');
+  badge.style.display = totalQty>0 ? 'flex' : 'none';
+  badge.textContent = totalQty;
+
+  // Sidebar items
+  const container = document.getElementById('cart-items');
+  if(!items.length){
+    container.innerHTML = '<div class="cart-empty"><span class="cart-empty-icon">🛒</span><p>Cart खाली है।<br>Products जोड़ें!</p></div>';
+    document.getElementById('cart-footer').style.display = 'none';
+    return;
+  }
+
+  container.innerHTML = items.map(({product:p, qty})=>`
+    <div class="cart-item">
+      <div class="cart-item-icon">${p.icon}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${p.name}</div>
+        <div style="font-size:.73rem;color:var(--txt3)">${p.unit}</div>
+        <div class="cart-item-price">₹${p.price} × ${qty} = ₹${p.price*qty}</div>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="updateCartQty(${p.id},-1)">−</button>
+          <span class="qty-display">${qty}</span>
+          <button class="qty-btn" onclick="updateCartQty(${p.id},1)">+</button>
+          <button class="remove-item" onclick="removeFromCart(${p.id})">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('cart-footer').style.display = 'block';
+  document.getElementById('cart-total').textContent = '₹'+totalPrice;
+}
+
+function openCart(){
+  document.getElementById('cart-sidebar').classList.add('open');
+  document.getElementById('cart-overlay').classList.add('show');
+}
+function closeCart(){
+  document.getElementById('cart-sidebar').classList.remove('open');
+  document.getElementById('cart-overlay').classList.remove('show');
+}
+
+// ── CHECKOUT ──
+function openCheckout(){
+  closeCart();
+  const items = Object.values(cart);
+  if(!items.length) return;
+  const total = items.reduce((a,b)=>a+b.product.price*b.qty,0);
+  const delivery = total >= 499 ? 0 : 49;
+
+  document.getElementById('order-summary').innerHTML = `
+    <div class="order-summary-title">Order Summary</div>
+    ${items.map(({product:p,qty})=>`<div class="order-line"><span>${p.icon} ${p.name} ×${qty}</span><span>₹${p.price*qty}</span></div>`).join('')}
+    <div class="order-line"><span>Delivery</span><span>${delivery===0?'<span style="color:var(--g5)">FREE 🎉</span>':'₹'+delivery}</span></div>
+    <div class="order-line total"><span>Total</span><span>₹${total+delivery}</span></div>`;
+
+  document.getElementById('checkout-modal').classList.add('show');
+  document.getElementById('checkout-content').style.display = 'block';
+}
+function closeCheckout(){
+  document.getElementById('checkout-modal').classList.remove('show');
+}
+
+function placeOrder(){
+  const name = document.getElementById('ord-name').value.trim();
+  const phone = document.getElementById('ord-phone').value.trim();
+  const addr = document.getElementById('ord-addr').value.trim();
+  const pin = document.getElementById('ord-pin').value.trim();
+  if(!name||!phone||!addr||!pin){ alert('कृपया सभी जानकारी भरें।'); return; }
+
+  const items = Object.values(cart);
+  const total = items.reduce((a,b)=>a+b.product.price*b.qty,0);
+  const delivery = total >= 499 ? 0 : 49;
+  const orderId = 'LS'+Date.now().toString().slice(-8);
+
+  // Submit to server
+  fetch('/api/order', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      order_id: orderId,
+      name, phone, address: addr, pincode: pin,
+      payment: document.getElementById('ord-payment').value,
+      items: items.map(({product:p,qty})=>({id:p.id,name:p.name,qty,price:p.price})),
+      total: total+delivery
+    })
+  }).catch(()=>{});
+
+  // Show success
+  document.getElementById('checkout-content').innerHTML = `
+    <div class="order-success">
+      <span class="order-success-icon">🎉</span>
+      <h3>Order Placed! धन्यवाद!</h3>
+      <div class="order-id">Order ID: ${orderId}</div>
+      <p>आपका order confirm हो गया।<br>
+      <strong>${document.getElementById('ord-payment').value==='cod'?'Cash on Delivery':'Payment'}</strong> — 
+      3-7 working days में delivery होगी।<br><br>
+      📞 Order status: <strong>1800-180-1551</strong> (Kisan Call Centre)</p>
+      <button class="modal-btn primary" style="margin-top:1rem;width:100%" onclick="closeCheckout();cart={};updateCartUI()">✅ ठीक है</button>
+    </div>`;
+  cart = {};
+  updateCartUI();
+}
+
+// ── DETECTION-BASED FILTER ──
+// When arriving from disease detection, URL may have ?disease=RiceBlast
+function initDetectionFilter(){
+  const params = new URLSearchParams(window.location.search);
+  const disease = params.get('disease');
+  if(disease){
+    const banner = document.getElementById('detection-banner');
+    if(banner){
+      banner.style.display = 'flex';
+      const nameEl = document.getElementById('detection-disease-name');
+      if(nameEl) nameEl.textContent = `Showing products recommended for: ${disease.replace(/_/g,' ')}`;
+    }
+    // Filter products whose disease field includes this disease name
+    const term = disease.replace(/_/g,' ').toLowerCase();
+    const grid = document.getElementById('products-grid');
+    const matched = PRODUCTS.filter(p => p.disease && p.disease.toLowerCase().includes(term));
+    if(matched.length > 0){
+      searchTerm = '';
+      currentFilter = 'all';
+      if(grid){
+        const stars = n => '⭐'.repeat(Math.round(n));
+        grid.innerHTML = matched.map(p=>{
+          const inCart = cart[p.id] && cart[p.id].qty > 0;
+          const diseaseBadge = `<div style="position:absolute;bottom:8px;left:8px;background:rgba(239,68,68,.9);color:#fff;padding:.15rem .5rem;border-radius:10px;font-size:.65rem;font-weight:700">🔬 Recommended</div>`;
+          return `<div class="product-card" data-id="${p.id}">
+            <div class="product-img">${p.icon}${p.badge?`<span class="product-badge">${p.badge}</span>`:''}${diseaseBadge}</div>
+            <div class="product-body">
+              <div class="product-category">${p.category.toUpperCase()}</div>
+              <div class="product-name">${p.name}</div>
+              <div style="font-size:.75rem;color:var(--g5);margin-bottom:.2rem">${p.hindi} • ${p.unit}</div>
+              <div class="product-rating"><span class="stars">${stars(p.rating)}</span> <span>${p.rating} (${p.reviews})</span></div>
+              <div class="product-desc">${p.desc}</div>
+              <div class="product-price-row"><div><span class="product-price">₹${p.price}</span><span class="product-mrp">₹${p.mrp}</span></div><span class="product-discount">-${p.discount}%</span></div>
+              <button class="add-to-cart ${inCart?'added':''}" onclick="addToCart(${p.id},event)">${inCart?'✅ Added to Cart':'🛒 Cart में जोड़ें'}</button>
+            </div></div>`;
+        }).join('');
+        // Add "See all products" link below
+        grid.innerHTML += `<div style="grid-column:1/-1;text-align:center;padding:1.5rem 0"><button onclick="clearDetectionFilter()" style="background:var(--g5);color:#fff;border:none;padding:.65rem 2rem;border-radius:12px;font-family:'Outfit',sans-serif;font-size:.9rem;cursor:pointer;font-weight:600">🌿 See All Products</button></div>`;
+      }
+    }
+  }
+}
+
+function clearDetectionFilter(){
+  const banner = document.getElementById('detection-banner');
+  if(banner) banner.style.display = 'none';
+  history.replaceState(null,'','/shop');
+  renderProducts();
+}
+
+// ── INIT ──
+renderProducts();
+initDetectionFilter();
+</script>
+{% endblock %}

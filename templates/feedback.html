@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% block title %}Feedback — LeafScan{% endblock %}
+
+{% block extra_css %}
+<style>
+.fb-page{max-width:680px;margin:0 auto;padding:0 1rem}
+.fb-hero{text-align:center;margin-bottom:2rem}
+.fb-hero h1{font-family:'Fraunces',serif;font-size:2rem;color:var(--g9);margin:.5rem 0}
+.fb-hero p{color:var(--txt3);font-size:.9rem}
+.fb-tabs{display:flex;gap:.5rem;background:var(--g1);border:1px solid var(--g2);border-radius:12px;padding:.3rem;margin-bottom:1.5rem}
+.fb-tab{flex:1;padding:.55rem;border-radius:9px;border:none;background:transparent;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;color:var(--txt2);cursor:pointer;transition:all .2s}
+.fb-tab.active{background:var(--warm);color:var(--g6);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.form-group{margin-bottom:1.3rem}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--txt2);margin-bottom:.4rem}
+.input{width:100%;padding:.7rem 1rem;border:1.5px solid var(--g2);border-radius:10px;font-family:'Outfit',sans-serif;font-size:.9rem;background:var(--cream);color:var(--txt);outline:none;transition:border-color .2s,box-shadow .2s}
+.input:focus{border-color:var(--g5);box-shadow:0 0 0 3px rgba(93,186,101,.13)}
+textarea.input{resize:vertical;min-height:110px}
+.stars{display:flex;gap:.4rem;margin-bottom:.3rem}
+.star{font-size:1.8rem;cursor:pointer;transition:transform .15s;user-select:none;filter:grayscale(1) opacity(.4)}
+.star.active{filter:none;transform:scale(1.1)}
+.category-grid{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem}
+.cat-chip{padding:.35rem .85rem;border-radius:20px;border:1.5px solid var(--g2);background:var(--cream);font-size:.78rem;font-weight:500;color:var(--txt2);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.cat-chip.active,.cat-chip:hover{background:var(--g5);color:#fff;border-color:var(--g5)}
+.voice-recorder{background:var(--g1);border:2px dashed var(--g3);border-radius:14px;padding:1.5rem;text-align:center}
+.voice-recorder.recording{border-color:#ef4444;background:#fef2f2}
+.rec-btn{width:72px;height:72px;border-radius:50%;border:none;cursor:pointer;font-size:2rem;display:flex;align-items:center;justify-content:center;margin:0 auto .8rem;transition:all .25s;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.rec-btn.idle{background:var(--g5);color:#fff}
+.rec-btn.idle:hover{background:var(--g6);transform:scale(1.05)}
+.rec-btn.rec-active{background:#ef4444;color:#fff;animation:recPulse .8s infinite}
+.rec-btn.has-rec{background:var(--g7);color:#fff}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.35)}50%{box-shadow:0 0 0 12px rgba(239,68,68,0)}}
+.rec-timer{font-size:1.4rem;font-weight:700;font-family:'Fraunces',serif;color:var(--g9);letter-spacing:.05em;margin-bottom:.3rem}
+.rec-status{font-size:.82rem;color:var(--txt3)}
+.rec-waveform{display:flex;align-items:center;justify-content:center;gap:3px;height:32px;margin:.6rem 0}
+.rec-bar{width:4px;border-radius:2px;background:var(--g4);height:4px;transition:height .08s}
+.audio-playback{margin-top:1rem;display:none}
+.audio-playback audio{width:100%;border-radius:8px}
+.rec-actions{display:flex;gap:.6rem;justify-content:center;margin-top:.8rem;display:none}
+.rec-action-btn{padding:.4rem 1rem;border-radius:8px;border:1.5px solid var(--g3);background:transparent;font-size:.8rem;font-weight:600;color:var(--g6);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.rec-action-btn.danger{border-color:#ef4444;color:#ef4444}
+.submit-btn{width:100%;padding:.85rem;background:var(--g5);color:#fff;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all .22s;box-shadow:0 4px 14px rgba(61,158,71,.3)}
+.submit-btn:hover{background:var(--g6)}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed}
+.success-box{background:linear-gradient(135deg,#d4edda,#c3e6cb);border:1px solid #b8dfc4;border-radius:16px;padding:2rem;text-align:center;display:none}
+.success-icon{font-size:3rem;display:block;margin-bottom:.8rem}
+.fb-list{margin-top:2rem}
+.fb-list h3{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--g9);margin-bottom:1rem}
+.fb-item{background:var(--warm);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:.8rem}
+.fb-item-header{display:flex;align-items:center;gap:8px;margin-bottom:.4rem}
+.fb-avatar{width:32px;height:32px;background:var(--g2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:var(--g7);flex-shrink:0}
+.fb-item-name{font-weight:600;font-size:.88rem;color:var(--g9)}
+.fb-item-stars{color:#f59e0b;font-size:.85rem}
+.fb-item-text{font-size:.84rem;color:var(--txt2);line-height:1.6}
+.fb-item-date{font-size:.72rem;color:var(--txt3);margin-top:.3rem}
+.lang-note{background:var(--g1);border:1px solid var(--g2);border-radius:8px;padding:.6rem .9rem;font-size:.8rem;color:var(--g7);margin-bottom:1rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="container">
+    <div class="fb-page">
+      <div class="fb-hero">
+        <div class="section-tag">💬 आपकी राय</div>
+        <h1>Feedback दें</h1>
+        <p>अपना अनुभव साझा करें — टाइप करके या आवाज़ रिकॉर्ड करके<br>Share your experience by typing or recording your voice</p>
+      </div>
+
+      <div class="lang-note">💡 आप हिंदी या अंग्रेजी दोनों में feedback दे सकते हैं। You can give feedback in Hindi or English.</div>
+
+      <div class="fb-tabs">
+        <button class="fb-tab active" onclick="switchTab('text')">✍️ Text Feedback</button>
+        <button class="fb-tab" onclick="switchTab('voice')">🎤 Voice Feedback</button>
+      </div>
+
+      <!-- TEXT TAB -->
+      <div id="tab-text">
+        <div class="card">
+          <form id="fb-form">
+            <div class="form-group">
+              <label>आपका नाम / Your Name</label>
+              <input class="input" type="text" name="name" placeholder="अपना नाम लिखें..." required>
+            </div>
+            <div class="form-group">
+              <label>Rating दें</label>
+              <div class="stars" id="stars">
+                <span class="star" data-val="1">⭐</span>
+                <span class="star" data-val="2">⭐</span>
+                <span class="star" data-val="3">⭐</span>
+                <span class="star" data-val="4">⭐</span>
+                <span class="star active" data-val="5">⭐</span>
+              </div>
+              <input type="hidden" name="rating" id="rating-val" value="5">
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <div class="category-grid" id="cat-grid">
+                <button type="button" class="cat-chip active" data-cat="General">General</button>
+                <button type="button" class="cat-chip" data-cat="Disease Detection">रोग पहचान</button>
+                <button type="button" class="cat-chip" data-cat="AI Chatbot">AI Chatbot</button>
+                <button type="button" class="cat-chip" data-cat="App Speed">App Speed</button>
+                <button type="button" class="cat-chip" data-cat="Suggestion">सुझाव</button>
+                <button type="button" class="cat-chip" data-cat="Bug">Bug Report</button>
+              </div>
+              <input type="hidden" name="category" id="cat-val" value="General">
+            </div>
+            <div class="form-group">
+              <label>आपका अनुभव / Your Message</label>
+              <textarea class="input" name="text" placeholder="LeafScan के बारे में बताएं..." required></textarea>
+            </div>
+            <button class="submit-btn" type="submit">💬 Feedback भेजें</button>
+          </form>
+          <div class="success-box" id="success-box">
+            <span class="success-icon">🎉</span>
+            <h3 style="font-family:'Fraunces',serif;color:#155724;font-size:1.5rem;margin-bottom:.4rem">धन्यवाद! Thank You!</h3>
+            <p style="color:#1e5c2e;font-size:.9rem">आपका feedback मिल गया। हम LeafScan को और बेहतर बनाएंगे! 🌾</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- VOICE TAB -->
+      <div id="tab-voice" style="display:none">
+        <div class="card">
+          <div class="form-group">
+            <label>आपका नाम / Your Name</label>
+            <input class="input" type="text" id="voice-name" placeholder="अपना नाम लिखें...">
+          </div>
+          <div class="form-group">
+            <label>Rating दें</label>
+            <div class="stars" id="voice-stars">
+              <span class="star" data-val="1">⭐</span>
+              <span class="star" data-val="2">⭐</span>
+              <span class="star" data-val="3">⭐</span>
+              <span class="star" data-val="4">⭐</span>
+              <span class="star active" data-val="5">⭐</span>
+            </div>
+            <input type="hidden" id="voice-rating" value="5">
+          </div>
+          <div class="form-group">
+            <label>🎤 Voice Message रिकॉर्ड करें (Max 2 min)</label>
+            <div class="voice-recorder" id="voice-recorder">
+              <button class="rec-btn idle" id="rec-btn" onclick="toggleRecording()">🎤</button>
+              <div class="rec-timer" id="rec-timer">0:00</div>
+              <div class="rec-status" id="rec-status">बटन दबाएं और अपनी बात कहें 🎙️</div>
+              <div class="rec-waveform" id="rec-waveform"></div>
+              <div class="audio-playback" id="audio-playback">
+                <audio id="audio-player" controls></audio>
+              </div>
+              <div class="rec-actions" id="rec-actions">
+                <button class="rec-action-btn danger" onclick="deleteRecording()">🗑️ Delete</button>
+                <button class="rec-action-btn" onclick="startRecording()">🔄 Re-record</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Additional Notes (optional)</label>
+            <textarea class="input" id="voice-text" placeholder="कुछ और लिखना चाहते हैं?" style="min-height:70px"></textarea>
+          </div>
+          <button class="submit-btn" id="voice-submit-btn" onclick="submitVoiceFeedback()">🎤 Voice Feedback भेजें</button>
+          <div class="success-box" id="voice-success-box" style="margin-top:1rem">
+            <span class="success-icon">🎉</span>
+            <h3 style="font-family:'Fraunces',serif;color:#155724;font-size:1.5rem;margin-bottom:.4rem">धन्यवाद!</h3>
+            <p style="color:#1e5c2e;font-size:.9rem">Voice feedback मिल गया। 🌾</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fb-list">
+        <h3>🌟 Recent Feedback</h3>
+        <div id="fb-items"><p style="color:var(--txt3);font-size:.85rem;text-align:center">Loading...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// TABS
+function switchTab(tab){
+  document.getElementById('tab-text').style.display=tab==='text'?'block':'none';
+  document.getElementById('tab-voice').style.display=tab==='voice'?'block':'none';
+  document.querySelectorAll('.fb-tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='text')||(i===1&&tab==='voice')));
+}
+
+// STARS
+function setupStars(cid,hid){
+  const c=document.getElementById(cid);
+  const stars=c.querySelectorAll('.star');
+  stars.forEach((s,i)=>{
+    s.addEventListener('click',()=>{
+      stars.forEach((ss,j)=>ss.classList.toggle('active',j<=i));
+      document.getElementById(hid).value=i+1;
+    });
+  });
+}
+setupStars('stars','rating-val');
+setupStars('voice-stars','voice-rating');
+
+// CATEGORY
+document.getElementById('cat-grid').addEventListener('click',e=>{
+  const c=e.target.closest('.cat-chip');
+  if(!c)return;
+  document.querySelectorAll('.cat-chip').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active');
+  document.getElementById('cat-val').value=c.dataset.cat;
+});
+
+// TEXT FORM
+document.getElementById('fb-form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const btn=e.target.querySelector('.submit-btn');
+  btn.disabled=true;btn.textContent='भेज रहे हैं...';
+  const fd=new FormData(e.target);
+  const res=await fetch('/feedback',{method:'POST',body:fd});
+  const data=await res.json();
+  if(data.success){
+    document.getElementById('fb-form').style.display='none';
+    document.getElementById('success-box').style.display='block';
+    loadFeedbacks();
+  } else {btn.disabled=false;btn.textContent='💬 Feedback भेजें';}
+});
+
+// VOICE RECORDING
+let mediaRecorder=null,audioChunks=[],recInterval=null,recSecs=0,audioBlob=null,isRec=false,analyser=null,animFrame=null;
+
+// Build waveform bars
+const wf=document.getElementById('rec-waveform');
+for(let i=0;i<18;i++){const b=document.createElement('div');b.className='rec-bar';wf.appendChild(b);}
+
+function toggleRecording(){ isRec?stopRecording():startRecording(); }
+
+async function startRecording(){
+  try{
+    deleteRecording();
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    const ctx=new AudioCtx();
+    const src=ctx.createMediaStreamSource(stream);
+    analyser=ctx.createAnalyser();analyser.fftSize=64;
+    src.connect(analyser);animateWaveform();
+
+    mediaRecorder=new MediaRecorder(stream);audioChunks=[];
+    mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+    mediaRecorder.onstop=()=>{
+      audioBlob=new Blob(audioChunks,{type:'audio/webm'});
+      document.getElementById('audio-player').src=URL.createObjectURL(audioBlob);
+      document.getElementById('audio-playback').style.display='block';
+      document.getElementById('rec-actions').style.display='flex';
+      stream.getTracks().forEach(t=>t.stop());
+      cancelAnimationFrame(animFrame);resetBars();
+    };
+    mediaRecorder.start();isRec=true;recSecs=0;
+    document.getElementById('rec-btn').className='rec-btn rec-active';
+    document.getElementById('rec-btn').textContent='⏹️';
+    document.getElementById('rec-status').textContent='रिकॉर्डिंग चल रही है... बोलते रहें 🎙️';
+    document.getElementById('voice-recorder').classList.add('recording');
+    recInterval=setInterval(()=>{
+      recSecs++;
+      document.getElementById('rec-timer').textContent=`${Math.floor(recSecs/60)}:${(recSecs%60).toString().padStart(2,'0')}`;
+      if(recSecs>=120)stopRecording();
+    },1000);
+  }catch(err){alert('Microphone access denied.\nकृपया microphone की अनुमति दें।');}
+}
+
+function stopRecording(){
+  if(mediaRecorder&&mediaRecorder.state!=='inactive'){
+    mediaRecorder.stop();clearInterval(recInterval);isRec=false;
+    document.getElementById('rec-btn').className='rec-btn has-rec';
+    document.getElementById('rec-btn').textContent='✅';
+    document.getElementById('rec-status').textContent='रिकॉर्डिंग पूरी! नीचे play करें ✅';
+    document.getElementById('voice-recorder').classList.remove('recording');
+  }
+}
+
+function deleteRecording(){
+  audioBlob=null;
+  document.getElementById('audio-player').src='';
+  document.getElementById('audio-playback').style.display='none';
+  document.getElementById('rec-actions').style.display='none';
+  document.getElementById('rec-btn').className='rec-btn idle';
+  document.getElementById('rec-btn').textContent='🎤';
+  document.getElementById('rec-status').textContent='बटन दबाएं और अपनी बात कहें 🎙️';
+  document.getElementById('rec-timer').textContent='0:00';
+  recSecs=0;
+}
+
+function animateWaveform(){
+  const bars=wf.querySelectorAll('.rec-bar');
+  const arr=new Uint8Array(analyser.frequencyBinCount);
+  function draw(){
+    animFrame=requestAnimationFrame(draw);analyser.getByteFrequencyData(arr);
+    bars.forEach((b,i)=>{const v=arr[i]||0;b.style.height=Math.max(4,v/4)+'px';});
+  }draw();
+}
+function resetBars(){wf.querySelectorAll('.rec-bar').forEach(b=>b.style.height='4px');}
+
+async function submitVoiceFeedback(){
+  const name=document.getElementById('voice-name').value.trim();
+  if(!name){alert('कृपया नाम लिखें');return;}
+  if(!audioBlob){alert('कृपया पहले voice record करें');return;}
+  const btn=document.getElementById('voice-submit-btn');
+  btn.disabled=true;btn.textContent='भेज रहे हैं...';
+  const fd=new FormData();
+  fd.append('name',name);
+  fd.append('rating',document.getElementById('voice-rating').value);
+  fd.append('text',document.getElementById('voice-text').value||'[Voice feedback]');
+  fd.append('category','Voice Feedback');
+  fd.append('audio',audioBlob,'feedback.webm');
+  const res=await fetch('/feedback/voice',{method:'POST',body:fd});
+  const data=await res.json();
+  if(data.success){
+    btn.style.display='none';
+    document.getElementById('voice-success-box').style.display='block';
+    loadFeedbacks();
+  } else {btn.disabled=false;btn.textContent='🎤 Voice Feedback भेजें';}
+}
+
+// LOAD FEEDBACKS
+async function loadFeedbacks(){
+  try{
+    const res=await fetch('/api/feedbacks');
+    const data=await res.json();
+    const c=document.getElementById('fb-items');
+    if(!data.feedbacks||!data.feedbacks.length){c.innerHTML='<p style="color:var(--txt3);font-size:.85rem;text-align:center">अभी कोई feedback नहीं। पहले feedback दें! 🌾</p>';return;}
+    c.innerHTML=data.feedbacks.slice(0,6).map(fb=>`
+      <div class="fb-item">
+        <div class="fb-item-header">
+          <div class="fb-avatar">${(fb.name||'?')[0].toUpperCase()}</div>
+          <div><div class="fb-item-name">${fb.name}</div><div class="fb-item-stars">${'⭐'.repeat(Math.min(parseInt(fb.rating||5),5))}</div></div>
+          ${fb.category?`<span style="margin-left:auto;background:var(--g1);border:1px solid var(--g2);color:var(--g7);padding:.15rem .6rem;border-radius:20px;font-size:.7rem;font-weight:600">${fb.category}</span>`:''}
+        </div>
+        <div class="fb-item-text">${fb.text}</div>
+        ${fb.has_audio?'<div style="display:inline-flex;align-items:center;gap:4px;background:var(--g1);border:1px solid var(--g2);color:var(--g7);padding:.15rem .6rem;border-radius:20px;font-size:.72rem;font-weight:600;margin-top:.4rem">🎤 Voice message</div>':''}
+        <div class="fb-item-date">📅 ${new Date(fb.created).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div>
+      </div>`).join('');
+  }catch(e){document.getElementById('fb-items').innerHTML='<p style="color:var(--txt3);font-size:.85rem">Could not load feedback.</p>';}
+}
+loadFeedbacks();
+</script>
+{% endblock %}

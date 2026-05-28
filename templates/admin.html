@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel{% endblock %}
+{% block extra_css %}
+<style>
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:2rem}
+.admin-card{background:var(--warm);border:1px solid var(--border);border-radius:16px;padding:1.5rem;box-shadow:var(--shadow)}
+.admin-card h2{font-family:'Fraunces',serif;font-size:1.1rem;color:var(--g9);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+.admin-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.admin-table th{text-align:left;padding:.5rem .6rem;font-weight:600;color:var(--txt3);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+.admin-table td{padding:.55rem .6rem;border-bottom:1px solid var(--border);color:var(--txt)}
+.admin-table tr:last-child td{border-bottom:none}
+.admin-table tr:hover td{background:var(--g1)}
+.stat-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-mini{background:var(--warm);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center}
+.stat-mini-val{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--g6)}
+.stat-mini-label{font-size:.72rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em}
+@media(max-width:768px){.admin-grid{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-wrap">
+  <div class="container">
+    <div class="section-tag">🔐 Admin</div>
+    <h1 style="font-family:'Fraunces',serif;font-size:2rem;color:var(--g9);margin:.5rem 0 1.5rem">Admin Dashboard</h1>
+
+    <div class="stat-bar">
+      <div class="stat-mini"><div class="stat-mini-val">{{ users_count }}</div><div class="stat-mini-label">Registered Users</div></div>
+      <div class="stat-mini"><div class="stat-mini-val">{{ predictions|length }}</div><div class="stat-mini-label">Total Predictions</div></div>
+      <div class="stat-mini"><div class="stat-mini-val">{{ feedbacks|length }}</div><div class="stat-mini-label">Feedbacks</div></div>
+    </div>
+
+    <div class="admin-grid">
+      <!-- Predictions -->
+      <div class="admin-card">
+        <h2>Recent Predictions</h2>
+        <table class="admin-table">
+          <tr><th>User</th><th>Disease</th><th>Conf.</th><th>Date</th></tr>
+          {% for p in predictions[:20] %}
+          <tr>
+            <td>{{ p.username or 'Guest' }}</td>
+            <td>{{ p.disease_name.replace('___',' ').replace('_',' ') }}</td>
+            <td>{{ p.confidence }}%</td>
+            <td>{{ p.created[:10] }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      <!-- Feedbacks -->
+      <div class="admin-card">
+        <h2>User Feedbacks</h2>
+        <table class="admin-table">
+          <tr><th>Name</th><th>Rating</th><th>Message</th><th>Date</th></tr>
+          {% for f in feedbacks %}
+          <tr>
+            <td>{{ f.name }}</td>
+            <td>{{ f.rating }}⭐</td>
+            <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.text }}</td>
+            <td>{{ f.created[:10] }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

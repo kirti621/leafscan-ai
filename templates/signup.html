@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Create Account{% endblock %}
+{% block extra_css %}
+<style>
+.auth-wrap{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:2rem}
+.auth-card{background:var(--warm);border:1px solid var(--border);border-radius:22px;padding:2.8rem 2.5rem;width:min(440px,100%);box-shadow:0 20px 60px rgba(20,70,25,.12)}
+.auth-logo{text-align:center;margin-bottom:2rem}
+.auth-logo span{font-size:3rem;display:block;margin-bottom:.5rem}
+.auth-logo h1{font-family:'Fraunces',serif;font-size:1.6rem;color:var(--g9);margin-bottom:.2rem}
+.auth-logo p{font-size:.85rem;color:var(--txt3)}
+.form-group{margin-bottom:1.2rem}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--txt2);margin-bottom:.4rem}
+.input{width:100%;padding:.7rem 1rem;border:1.5px solid var(--g2);border-radius:10px;font-family:'Outfit',sans-serif;font-size:.9rem;background:var(--cream);color:var(--txt);transition:border-color .2s,box-shadow .2s;outline:none}
+.input:focus{border-color:var(--g5);box-shadow:0 0 0 3px rgba(93,186,101,.15)}
+.btn-full{width:100%;padding:.8rem;border-radius:12px;font-size:.97rem;margin-top:.5rem}
+.auth-footer{text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--txt3)}
+.auth-footer a{color:var(--g6);font-weight:600;text-decoration:none}
+.perks{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.5rem}
+.perk{background:var(--g1);border:1px solid var(--g2);border-radius:9px;padding:.5rem .7rem;font-size:.76rem;color:var(--txt2);display:flex;gap:5px;align-items:center}
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span>🌿</span>
+      <h1>Create Account</h1>
+      <p>Start detecting plant diseases for free</p>
+    </div>
+    <div class="perks">
+      <div class="perk">✅ Free to use</div>
+      <div class="perk">📋 Save history</div>
+      <div class="perk">🔬 Unlimited scans</div>
+      <div class="perk">📊 Your dashboard</div>
+    </div>
+    <form method="POST" action="/signup">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input class="input" type="text" id="username" name="username" placeholder="Choose a username" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input class="input" type="password" id="password" name="password" placeholder="Create a strong password" required autocomplete="new-password">
+      </div>
+      <button class="btn btn-primary btn-full" type="submit">🌱 Create Account</button>
+    </form>
+    <div class="auth-footer">
+      Already have an account? <a href="/login">Log in</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

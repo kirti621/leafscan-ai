@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block extra_css %}
+<style>
+.auth-wrap{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:2rem}
+.auth-card{background:var(--warm);border:1px solid var(--border);border-radius:22px;padding:2.8rem 2.5rem;width:min(440px,100%);box-shadow:0 20px 60px rgba(20,70,25,.12)}
+.auth-logo{text-align:center;margin-bottom:2rem}
+.auth-logo span{font-size:3rem;display:block;margin-bottom:.5rem}
+.auth-logo h1{font-family:'Fraunces',serif;font-size:1.6rem;color:var(--g9);margin-bottom:.2rem}
+.auth-logo p{font-size:.85rem;color:var(--txt3)}
+.form-group{margin-bottom:1.2rem}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--txt2);margin-bottom:.4rem}
+.input{width:100%;padding:.7rem 1rem;border:1.5px solid var(--g2);border-radius:10px;font-family:'Outfit',sans-serif;font-size:.9rem;background:var(--cream);color:var(--txt);transition:border-color .2s,box-shadow .2s;outline:none}
+.input:focus{border-color:var(--g5);box-shadow:0 0 0 3px rgba(93,186,101,.15)}
+.btn-full{width:100%;padding:.8rem;border-radius:12px;font-size:.97rem;margin-top:.5rem}
+.auth-footer{text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--txt3)}
+.auth-footer a{color:var(--g6);font-weight:600;text-decoration:none}
+.auth-footer a:hover{text-decoration:underline}
+.divider{text-align:center;color:var(--txt3);font-size:.8rem;margin:1rem 0;position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--g2)}
+.divider::before{left:0}.divider::after{right:0}
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span>🌿</span>
+      <h1>Welcome back</h1>
+      <p>Log in to your LeafScan account</p>
+    </div>
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input class="input" type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input class="input" type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary btn-full" type="submit">🔐 Log In</button>
+    </form>
+    <div class="auth-footer">
+      Don't have an account? <a href="/signup">Sign up free</a>
+    </div>
+    <div class="divider">or</div>
+    <div style="text-align:center">
+      <a href="/upload" class="btn btn-outline" style="font-size:.85rem;padding:.5rem 1.2rem">Continue without account →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block extra_css %}
+<style>
+.dash-hero{background:linear-gradient(135deg,var(--g9) 0%,var(--g7) 100%);padding:3rem 0 2.5rem;margin-bottom:2rem}
+.dash-hero-inner{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.avatar-big{width:56px;height:56px;background:var(--g4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:var(--g9);flex-shrink:0}
+.dash-hero h1{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:#fff}
+.dash-hero p{font-size:.88rem;color:rgba(255,255,255,.55)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+.metric{background:var(--warm);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;box-shadow:var(--shadow)}
+.metric-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--txt3);margin-bottom:.35rem}
+.metric-val{font-family:'Fraunces',serif;font-size:2rem;font-weight:700;color:var(--g6)}
+.metric-sub{font-size:.75rem;color:var(--txt3);margin-top:2px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.section-head h2{font-family:'Fraunces',serif;font-size:1.1rem;color:var(--g9)}
+.predictions-list{display:flex;flex-direction:column;gap:.7rem}
+.pred-item{background:var(--warm);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;display:flex;align-items:center;gap:1rem;box-shadow:var(--shadow);transition:all .2s}
+.pred-item:hover{transform:translateX(3px);border-color:var(--g3)}
+.pred-icon{width:40px;height:40px;background:var(--g1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.pred-name{font-size:.9rem;font-weight:600;color:var(--g9)}
+.pred-conf{font-size:.78rem;color:var(--txt3);margin-top:2px}
+.pred-date{margin-left:auto;font-size:.75rem;color:var(--txt3);text-align:right;flex-shrink:0}
+.empty-preds{text-align:center;padding:2.5rem;color:var(--txt3);font-size:.88rem}
+.cta-card{background:linear-gradient(135deg,var(--g7) 0%,var(--g5) 100%);border-radius:18px;padding:2rem;text-align:center;margin-top:2rem}
+.cta-card h2{font-family:'Fraunces',serif;font-size:1.3rem;color:#fff;margin-bottom:.4rem}
+.cta-card p{font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:1.2rem}
+</style>
+{% endblock %}
+{% block content %}
+<div style="padding-top:62px">
+  <div class="dash-hero">
+    <div class="container">
+      <div class="dash-hero-inner">
+        <div class="avatar-big">{{ username[0].upper() }}</div>
+        <div>
+          <h1>Welcome, {{ username }}!</h1>
+          <p>Your plant health dashboard · LeafScan AI</p>
+        </div>
+        <a href="/upload" class="btn btn-primary" style="margin-left:auto">🔬 New Scan</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="padding-bottom:4rem">
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Total Scans</div>
+        <div class="metric-val">{{ total }}</div>
+        <div class="metric-sub">All time</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Account</div>
+        <div class="metric-val" style="font-size:1.3rem">{{ username }}</div>
+        <div class="metric-sub">Active member</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Recent Scans</h2>
+      <a href="/history" class="btn btn-outline" style="font-size:.82rem;padding:.38rem .9rem">View All</a>
+    </div>
+
+    {% if recent %}
+    <div class="predictions-list">
+      {% for p in recent %}
+      <div class="pred-item">
+        <div class="pred-icon">
+          {% if 'scab' in p.disease_name.lower() %}🍎
+          {% elif 'rot' in p.disease_name.lower() %}🟤
+          {% elif 'rust' in p.disease_name.lower() %}🟠
+          {% elif 'healthy' in p.disease_name.lower() %}💚
+          {% else %}🦠{% endif %}
+        </div>
+        <div>
+          <div class="pred-name">{{ p.disease_name.replace('___',' — ').replace('_',' ') }}</div>
+          <div class="pred-conf">Confidence: {{ p.confidence }}%</div>
+        </div>
+        <div class="pred-date">{{ p.created[:10] }}<br>{{ p.created[11:16] }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-preds">
+      <span style="font-size:2.5rem;display:block;margin-bottom:.5rem">🌱</span>
+      No scans yet. Upload your first plant photo to get started!
+    </div>
+    {% endif %}
+
+    <div class="cta-card">
+      <h2>Scan a New Plant</h2>
+      <p>Upload a leaf photo and get instant disease detection results</p>
+      <a href="/upload" class="btn" style="background:#fff;color:var(--g7);font-weight:700">🔬 Start Detection →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

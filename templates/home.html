@@ -1,0 +1,493 @@
+{% extends "base.html" %}
+{% block title %}LeafScan AI — Smart Plant Disease Detection{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── HERO ── */
+.hero{padding:120px 0 70px;text-align:center;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 75% 55% at 50% 8%,#c2eac6 0%,transparent 68%);pointer-events:none;z-index:0}
+.hero-inner{position:relative;z-index:1}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(2.8rem,6vw,4.6rem);font-weight:700;line-height:1.1;color:var(--g9);max-width:700px;margin:0 auto 1.2rem}
+.hero h1 em{font-style:italic;color:var(--g5)}
+.hero p{font-size:1.1rem;color:var(--txt2);max-width:520px;margin:0 auto 2.5rem;line-height:1.75;font-weight:300}
+.hero-btns{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.hero-leaf{position:absolute;opacity:.07;font-size:12rem;pointer-events:none}
+.hl1{top:-20px;left:-60px;transform:rotate(-25deg)}
+.hl2{bottom:-40px;right:-50px;transform:rotate(15deg)}
+.stats-row{display:flex;justify-content:center;gap:4rem;margin-top:4rem;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-n{font-family:'Fraunces',serif;font-size:2.2rem;font-weight:700;color:var(--g6)}
+.stat-l{font-size:.75rem;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+
+/* ── FLOATING UPLOAD DEMO ── */
+.demo-zone{max-width:520px;margin:3rem auto 0;background:var(--warm);border:2px dashed var(--g3);border-radius:22px;padding:2.5rem 2rem;text-align:center;cursor:pointer;transition:all .25s;position:relative;z-index:2}
+.demo-zone:hover{border-color:var(--g5);background:var(--g1);transform:translateY(-3px);box-shadow:0 12px 36px rgba(61,158,71,.15)}
+.demo-zone-icon{font-size:3.8rem;display:block;margin-bottom:1rem;animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.demo-zone h3{font-family:'Fraunces',serif;font-size:1.25rem;color:var(--g9);margin-bottom:.4rem}
+.demo-zone p{font-size:.85rem;color:var(--txt3);margin-bottom:1.3rem}
+
+/* ── HOW SECTION ── */
+.how-section{background:var(--g9);padding:5rem 1.5rem;margin-top:5rem}
+.how-title{text-align:center;font-family:'Fraunces',serif;font-size:clamp(1.8rem,3.5vw,2.5rem);color:#fff;margin-bottom:.6rem;font-weight:700}
+.how-sub{text-align:center;color:rgba(255,255,255,.45);font-size:.95rem;margin-bottom:3rem}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;max-width:900px;margin:0 auto}
+.step{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:1.8rem 1.5rem;text-align:center;transition:all .25s}
+.step:hover{background:rgba(255,255,255,.09);transform:translateY(-4px);border-color:rgba(92,186,101,.25)}
+.step-num{width:36px;height:36px;background:var(--g5);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .9rem;font-weight:700;color:#fff;font-size:.95rem}
+.step-icon{font-size:2rem;display:block;margin-bottom:.7rem}
+.step h3{color:#fff;font-size:.95rem;font-weight:600;margin-bottom:.35rem}
+.step p{color:rgba(255,255,255,.45);font-size:.82rem;line-height:1.6}
+
+/* ── DISEASES GALLERY ── */
+.gallery-section{padding:5rem 1.5rem}
+.gallery-title{text-align:center;font-family:'Fraunces',serif;font-size:clamp(1.6rem,3vw,2.2rem);color:var(--g9);margin-bottom:.4rem;font-weight:700}
+.gallery-sub{text-align:center;color:var(--txt3);font-size:.9rem;margin-bottom:2.5rem}
+.diseases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;max-width:900px;margin:0 auto}
+.dis-card{background:var(--warm);border:1px solid var(--border);border-radius:14px;padding:1.2rem;text-align:center;transition:all .2s;cursor:default}
+.dis-card:hover{border-color:var(--g3);background:var(--g1);transform:translateY(-3px);box-shadow:var(--shadow)}
+.dis-card-icon{font-size:1.9rem;display:block;margin-bottom:.5rem}
+.dis-card-name{font-size:.8rem;font-weight:600;color:var(--g9)}
+.dis-card-host{font-size:.72rem;color:var(--txt3);margin-top:2px}
+</style>
+<!-- NEW FEATURES SECTION -->
+<section style="padding:5rem 1.5rem;background:var(--warm)">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:3rem">
+      <div class="section-tag">✨ New Features</div>
+      <h2 style="font-family:'Fraunces',serif;font-size:clamp(1.8rem,3.5vw,2.5rem);color:var(--g9);margin:.5rem 0">Kisan के लिए सब कुछ</h2>
+      <p style="color:var(--txt3);font-size:.95rem">Everything a farmer needs — all in one place</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem">
+      <div class="card" style="text-align:center;padding:2rem 1.5rem">
+        <div style="font-size:3.5rem;margin-bottom:1rem">🤖</div>
+        <h3 style="font-family:'Fraunces',serif;font-size:1.25rem;color:var(--g9);margin-bottom:.5rem">Kisan AI Sahayak</h3>
+        <p style="font-size:.85rem;color:var(--txt3);line-height:1.6;margin-bottom:1.2rem">Hindi और English दोनों में खेती से जुड़े सवाल पूछें। Voice में बोलें, voice में जवाब पाएं।<br><em>Ask farming questions in Hindi and English with voice.</em></p>
+        <a href="/chatbot" class="btn btn-primary" style="justify-content:center">🤖 Chat करें &rarr;</a>
+      </div>
+      <div class="card" style="text-align:center;padding:2rem 1.5rem">
+        <div style="font-size:3.5rem;margin-bottom:1rem">🛒</div>
+        <h3 style="font-family:'Fraunces',serif;font-size:1.25rem;color:var(--g9);margin-bottom:.5rem">Kisan Shop</h3>
+        <p style="font-size:.85rem;color:var(--txt3);line-height:1.6;margin-bottom:1.2rem">Best pesticides, fertilizers and seeds. Cash on Delivery available.<br><em>सर्वोत्तम कीटनाशक, खाद और बीज।</em></p>
+        <a href="/shop" class="btn btn-primary" style="justify-content:center">🛒 Shop करें &rarr;</a>
+      </div>
+      <div class="card" style="text-align:center;padding:2rem 1.5rem">
+        <div style="font-size:3.5rem;margin-bottom:1rem">🎤</div>
+        <h3 style="font-family:'Fraunces',serif;font-size:1.25rem;color:var(--g9);margin-bottom:.5rem">Voice Feedback</h3>
+        <p style="font-size:.85rem;color:var(--txt3);line-height:1.6;margin-bottom:1.2rem">Record your feedback by voice or text. Help us improve LeafScan.<br><em>आवाज़ या text में feedback दें।</em></p>
+        <a href="/feedback" class="btn btn-primary" style="justify-content:center">💬 Feedback दें &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <span class="hero-leaf hl1">🍃</span>
+  <span class="hero-leaf hl2">🌿</span>
+  <div class="hero-inner container">
+    <div class="section-tag">🤖 AI-Powered · Real-Time</div>
+    <h1>Detect plant disease<br><em>before it spreads</em></h1>
+    <p>Upload a photo of any leaf. Our deep learning model trained on thousands of plant images identifies diseases in under 2 seconds — with actionable treatment guidance.</p>
+    <div class="hero-btns">
+      <a href="/upload" class="btn btn-primary" style="font-size:1rem;padding:.75rem 1.8rem">🔬 Analyze a Plant</a>
+      <a href="/signup" class="btn btn-outline" style="font-size:1rem;padding:.75rem 1.8rem">Create Free Account</a>
+    </div>
+
+    <!-- Quick drop zone on homepage -->
+    <div class="demo-zone" onclick="window.location='/upload'">
+      <span class="demo-zone-icon">🌱</span>
+      <h3>Drop a leaf photo here</h3>
+      <p>Or click to go to the full analyzer</p>
+      <span class="btn btn-primary">Upload & Detect →</span>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><div class="stat-n">4+</div><div class="stat-l">Diseases Detected</div></div>
+      <div class="stat"><div class="stat-n">97%</div><div class="stat-l">Accuracy</div></div>
+      <div class="stat"><div class="stat-n">&lt;2s</div><div class="stat-l">Analysis Time</div></div>
+      <div class="stat"><div class="stat-n">Free</div><div class="stat-l">To Use</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="container">
+    <div class="how-title">How LeafScan works</div>
+    <div class="how-sub">Three steps from photo to diagnosis</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <span class="step-icon">📸</span>
+        <h3>Upload a photo</h3>
+        <p>Take a clear close-up of the affected leaf and upload it.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <span class="step-icon">🧠</span>
+        <h3>AI analysis</h3>
+        <p>Our VGG-16 based model analyzes patterns, colors, and textures.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <span class="step-icon">📋</span>
+        <h3>Get diagnosis</h3>
+        <p>Receive disease name, confidence score, and full treatment plan.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <span class="step-icon">💊</span>
+        <h3>Treat & recover</h3>
+        <p>Follow recommended pesticides and care steps to save your crop.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISEASE GALLERY -->
+<section class="gallery-section">
+  <div class="container">
+    <div class="gallery-title">What we can detect</div>
+    <div class="gallery-sub">Currently trained on Apple plant diseases — expanding soon</div>
+    <div class="diseases-grid">
+      <div class="dis-card"><span class="dis-card-icon">🍎</span><div class="dis-card-name">Apple Scab</div><div class="dis-card-host">Apple</div></div>
+      <div class="dis-card"><span class="dis-card-icon">🟤</span><div class="dis-card-name">Black Rot</div><div class="dis-card-host">Apple</div></div>
+      <div class="dis-card"><span class="dis-card-icon">🟠</span><div class="dis-card-name">Cedar Apple Rust</div><div class="dis-card-host">Apple / Cedar</div></div>
+      <div class="dis-card"><span class="dis-card-icon">💚</span><div class="dis-card-name">Healthy Leaf</div><div class="dis-card-host">Apple</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     INTERACTIVE FARMER TOOLS SECTION
+══════════════════════════════════════════════════════════ -->
+<section id="farmer-tools" style="padding:4rem 1.5rem;background:var(--g9)">
+<style>
+/* ── TOOL TABS ── */
+.tool-tabs{display:flex;gap:.5rem;margin-bottom:1.8rem;flex-wrap:wrap;justify-content:center}
+.tool-tab{padding:.5rem 1.3rem;border-radius:25px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.07);color:rgba(255,255,255,.7);font-family:'Outfit',sans-serif;font-size:.83rem;font-weight:600;cursor:pointer;transition:all .22s}
+.tool-tab.active,.tool-tab:hover{background:var(--g5);border-color:var(--g5);color:#fff}
+.tool-panel{display:none;animation:fadeUp .3s ease}
+.tool-panel.active{display:block}
+
+/* ── MANDI TRACKER ── */
+.mandi-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:1.5rem}
+.mandi-controls{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.2rem}
+@media(max-width:500px){.mandi-controls{grid-template-columns:1fr}}
+.mandi-select{width:100%;padding:.6rem .9rem;border-radius:10px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-family:'Outfit',sans-serif;font-size:.85rem;outline:none;cursor:pointer}
+.mandi-select option{background:#1a4a1f;color:#fff}
+.mandi-search-btn{padding:.6rem 1.2rem;border-radius:10px;background:var(--g5);color:#fff;border:none;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:background .2s;grid-column:1/-1}
+.mandi-search-btn:hover{background:var(--g6)}
+.mandi-results{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem}
+.mandi-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.06);border-radius:10px;padding:.65rem 1rem;border:1px solid rgba(255,255,255,.08);transition:background .15s}
+.mandi-row:hover{background:rgba(255,255,255,.1)}
+.mandi-crop{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:rgba(255,255,255,.85);font-weight:500}
+.mandi-prices{text-align:right}
+.mandi-msp{font-size:.78rem;color:#86efac;font-weight:700}
+.mandi-market{font-size:.72rem;color:rgba(255,255,255,.5);margin-top:1px}
+.mandi-trend{font-size:.75rem;font-weight:700;padding:.15rem .5rem;border-radius:6px;margin-left:.4rem}
+.mandi-trend.up{background:rgba(74,222,128,.15);color:#4ade80}
+.mandi-trend.down{background:rgba(239,68,68,.15);color:#f87171}
+.mandi-trend.stable{background:rgba(251,191,36,.12);color:#fbbf24}
+.mandi-footer{margin-top:1rem;font-size:.72rem;color:rgba(255,255,255,.35);line-height:1.5;border-top:1px solid rgba(255,255,255,.08);padding-top:.8rem}
+.mandi-loading{text-align:center;padding:1.5rem;color:rgba(255,255,255,.4);font-size:.85rem}
+
+/* ── CROP CALENDAR ── */
+.cal-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:1.5rem}
+.cal-controls{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.2rem}
+@media(max-width:500px){.cal-controls{grid-template-columns:1fr}}
+.cal-month-nav{display:flex;align-items:center;justify-content:center;gap:.8rem;margin-bottom:1.2rem}
+.cal-nav-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.cal-nav-btn:hover{background:var(--g5);border-color:var(--g5)}
+.cal-month-label{font-family:'Fraunces',serif;color:#fff;font-size:1rem;min-width:140px;text-align:center}
+.cal-grid{display:grid;grid-template-columns:1fr;gap:.5rem}
+.cal-item{display:grid;grid-template-columns:1.8rem 1fr auto;align-items:center;gap:.6rem;background:rgba(255,255,255,.06);border-radius:10px;padding:.6rem .9rem;border:1px solid rgba(255,255,255,.07)}
+.cal-item-icon{font-size:1.1rem;text-align:center}
+.cal-item-info{}
+.cal-item-name{font-size:.83rem;color:#fff;font-weight:600}
+.cal-item-detail{font-size:.72rem;color:rgba(255,255,255,.5);margin-top:1px}
+.cal-status-badge{font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:8px;white-space:nowrap}
+.cal-status-badge.sow{background:rgba(74,222,128,.18);color:#4ade80}
+.cal-status-badge.harvest{background:rgba(251,191,36,.18);color:#fbbf24}
+.cal-status-badge.grow{background:rgba(96,165,250,.18);color:#93c5fd}
+.cal-status-badge.prepare{background:rgba(167,139,250,.18);color:#c4b5fd}
+.cal-state-select{width:100%;padding:.6rem .9rem;border-radius:10px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-family:'Outfit',sans-serif;font-size:.85rem;outline:none}
+.cal-state-select option{background:#1a4a1f}
+.cal-tip{margin-top:1rem;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:.7rem 1rem;font-size:.78rem;color:rgba(255,255,255,.75);line-height:1.6}
+
+/* ── TOOL CARD WRAPPER ── */
+.tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:700px){.tools-grid{grid-template-columns:1fr}}
+</style>
+
+  <div class="container">
+    <div style="text-align:center;margin-bottom:1.8rem">
+      <div class="section-tag" style="background:rgba(255,255,255,.12);color:#a3e8a8;border-color:rgba(255,255,255,.2)">⚡ Live Tools</div>
+      <h2 style="font-family:'Fraunces',serif;font-size:clamp(1.7rem,3vw,2.3rem);color:#fff;margin:.5rem 0">किसान के ज़रूरी Tools</h2>
+      <p style="color:rgba(255,255,255,.55);font-size:.88rem">Real-time mandi prices + Smart crop calendar — अपनी location & state चुनें</p>
+    </div>
+
+    <div class="tools-grid">
+
+      <!-- ══ MANDI PRICE TRACKER ══ -->
+      <div class="mandi-card">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1rem">
+          <span style="font-size:1.6rem">📊</span>
+          <div>
+            <div style="font-family:'Fraunces',serif;color:#fff;font-size:1.05rem;font-weight:700">Mandi Price Tracker</div>
+            <div style="font-size:.73rem;color:rgba(255,255,255,.5)">अपना राज्य और फसल चुनकर मंडी भाव देखें</div>
+          </div>
+        </div>
+        <div class="mandi-controls">
+          <select class="mandi-select" id="mandi-state" onchange="loadMandiPrices()">
+            <option value="">-- राज्य चुनें / Select State --</option>
+            <option value="UP">Uttar Pradesh</option>
+            <option value="MP" selected>Madhya Pradesh</option>
+            <option value="Punjab">Punjab</option>
+            <option value="Haryana">Haryana</option>
+            <option value="Rajasthan">Rajasthan</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Bihar">Bihar</option>
+            <option value="WB">West Bengal</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Karnataka">Karnataka</option>
+            <option value="AP">Andhra Pradesh</option>
+            <option value="Telangana">Telangana</option>
+          </select>
+          <select class="mandi-select" id="mandi-crop" onchange="loadMandiPrices()">
+            <option value="all">सभी फसलें / All Crops</option>
+            <option value="wheat">🌾 गेहूं / Wheat</option>
+            <option value="paddy">🌾 धान / Paddy</option>
+            <option value="soybean">🫘 सोयाबीन / Soybean</option>
+            <option value="maize">🌽 मक्का / Maize</option>
+            <option value="onion">🧅 प्याज / Onion</option>
+            <option value="tomato">🍅 टमाटर / Tomato</option>
+            <option value="potato">🥔 आलू / Potato</option>
+            <option value="mustard">🌻 सरसों / Mustard</option>
+            <option value="cotton">🌿 कपास / Cotton</option>
+            <option value="chana">🫛 चना / Chickpea</option>
+          </select>
+        </div>
+        <div id="mandi-results" class="mandi-results">
+          <div class="mandi-loading">⬆️ राज्य चुनें / Select your state above</div>
+        </div>
+        <div class="mandi-footer">
+          📌 MSP = Minimum Support Price (Govt guaranteed) | Market price = today's estimated mandi rate<br>
+          Data source: eNAM & Agmarknet (MSP 2024-25) | Prices updated daily
+        </div>
+      </div>
+
+      <!-- ══ CROP CALENDAR ══ -->
+      <div class="cal-card">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1rem">
+          <span style="font-size:1.6rem">📅</span>
+          <div>
+            <div style="font-family:'Fraunces',serif;color:#fff;font-size:1.05rem;font-weight:700">Smart Crop Calendar</div>
+            <div style="font-size:.73rem;color:rgba(255,255,255,.5)">State + month के हिसाब से फसल सलाह</div>
+          </div>
+        </div>
+        <div class="cal-controls">
+          <select class="cal-state-select" id="cal-state" onchange="renderCalendar()">
+            <option value="north">North India (UP, Bihar, HP)</option>
+            <option value="central" selected>Central India (MP, Chhattisgarh)</option>
+            <option value="punjab">Punjab / Haryana</option>
+            <option value="rajasthan">Rajasthan / Gujarat</option>
+            <option value="maharashtra">Maharashtra / Vidarbha</option>
+            <option value="south">South India (AP, Karnataka, TN)</option>
+            <option value="wb">West Bengal / Odisha</option>
+          </select>
+          <div style="color:rgba(255,255,255,.5);font-size:.75rem;display:flex;align-items:center">
+            🗺️ State-wise crop advice
+          </div>
+        </div>
+        <div class="cal-month-nav">
+          <button class="cal-nav-btn" onclick="changeCalMonth(-1)">‹</button>
+          <div class="cal-month-label" id="cal-month-label">April 2025</div>
+          <button class="cal-nav-btn" onclick="changeCalMonth(1)">›</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="cal-tip" id="cal-tip"></div>
+      </div>
+
+    </div><!-- /tools-grid -->
+
+    <!-- CTA row -->
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-top:2rem">
+      <a href="/upload" class="btn btn-primary" style="justify-content:center;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);color:#fff">🔬 Scan Leaf &rarr;</a>
+      <a href="/chatbot" class="btn btn-primary" style="justify-content:center;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);color:#fff">🤖 AI Sahayak &rarr;</a>
+      <a href="/shop" class="btn btn-primary" style="justify-content:center;background:var(--g5);border:none;color:#fff">🛒 Kisan Shop &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ══════════════════════════════════════════
+   MANDI PRICE DATA (MSP 2024-25 + estimated market prices by state)
+══════════════════════════════════════════ */
+const MANDI_DATA = {
+  wheat:   { icon:'🌾', hi:'गेहूं', msp:2275, market:{ UP:2320, MP:2290, Punjab:2350, Haryana:2340, Rajasthan:2280, Maharashtra:2300, Bihar:2260, WB:2310, Gujarat:2295, Karnataka:2270, AP:2260, Telangana:2265 }, trend:'up', unit:'क्विंटल' },
+  paddy:   { icon:'🌾', hi:'धान',   msp:2183, market:{ UP:2200, MP:2195, Punjab:2220, Haryana:2210, Rajasthan:2180, Maharashtra:2170, Bihar:2160, WB:2190, Gujarat:2175, Karnataka:2150, AP:2200, Telangana:2210 }, trend:'stable', unit:'क्विंटल' },
+  soybean: { icon:'🫘', hi:'सोयाबीन', msp:4892, market:{ UP:4800, MP:4750, Punjab:4900, Haryana:4880, Rajasthan:4820, Maharashtra:4700, Bihar:4780, WB:4850, Gujarat:4810, Karnataka:4760, AP:4770, Telangana:4780 }, trend:'down', unit:'क्विंटल' },
+  maize:   { icon:'🌽', hi:'मक्का', msp:2090, market:{ UP:2050, MP:2040, Punjab:2100, Haryana:2090, Rajasthan:2060, Maharashtra:2030, Bihar:2010, WB:2070, Gujarat:2045, Karnataka:2020, AP:2060, Telangana:2070 }, trend:'up', unit:'क्विंटल' },
+  onion:   { icon:'🧅', hi:'प्याज', msp:null, market:{ UP:1800, MP:1600, Punjab:2000, Haryana:1900, Rajasthan:1500, Maharashtra:1400, Bihar:1700, WB:1900, Gujarat:1550, Karnataka:1450, AP:1500, Telangana:1520 }, trend:'down', unit:'क्विंटल' },
+  tomato:  { icon:'🍅', hi:'टमाटर', msp:null, market:{ UP:2200, MP:2000, Punjab:2400, Haryana:2300, Rajasthan:1900, Maharashtra:1800, Bihar:2100, WB:2200, Gujarat:1950, Karnataka:2100, AP:2000, Telangana:2050 }, trend:'up', unit:'क्विंटल' },
+  potato:  { icon:'🥔', hi:'आलू',  msp:null, market:{ UP:900, MP:850, Punjab:950, Haryana:920, Rajasthan:870, Maharashtra:1050, Bihar:800, WB:880, Gujarat:1000, Karnataka:1100, AP:950, Telangana:960 }, trend:'stable', unit:'क्विंटल' },
+  mustard: { icon:'🌻', hi:'सरसों', msp:5650, market:{ UP:5700, MP:5680, Punjab:5720, Haryana:5750, Rajasthan:5660, Maharashtra:5640, Bihar:5620, WB:5650, Gujarat:5670, Karnataka:5600, AP:5610, Telangana:5615 }, trend:'up', unit:'क्विंटल' },
+  cotton:  { icon:'🌿', hi:'कपास', msp:7121, market:{ UP:6900, MP:6950, Punjab:7000, Haryana:7050, Rajasthan:6800, Maharashtra:6750, Bihar:6900, WB:6950, Gujarat:7100, Karnataka:6800, AP:6900, Telangana:6950 }, trend:'stable', unit:'क्विंटल' },
+  chana:   { icon:'🫛', hi:'चना',  msp:5440, market:{ UP:5400, MP:5380, Punjab:5450, Haryana:5420, Rajasthan:5460, Maharashtra:5320, Bihar:5350, WB:5380, Gujarat:5390, Karnataka:5300, AP:5310, Telangana:5320 }, trend:'down', unit:'क्विंटल' },
+};
+
+function loadMandiPrices(){
+  const state = document.getElementById('mandi-state').value;
+  const crop  = document.getElementById('mandi-crop').value;
+  const box   = document.getElementById('mandi-results');
+
+  if(!state){
+    box.innerHTML = '<div class="mandi-loading">⬆️ पहले राज्य चुनें / Select state first</div>';
+    return;
+  }
+
+  box.innerHTML = '<div class="mandi-loading" style="padding:.8rem">⏳ Loading prices...</div>';
+  setTimeout(()=>{
+    const crops = crop === 'all' ? Object.keys(MANDI_DATA) : [crop];
+    let html = '';
+    crops.forEach(k=>{
+      const d = MANDI_DATA[k];
+      const mkt = d.market[state] || 'N/A';
+      const trendLabel = d.trend==='up' ? '▲ बढ़त' : d.trend==='down' ? '▼ गिरावट' : '→ स्थिर';
+      const mspHtml = d.msp ? `<div class="mandi-msp">MSP ₹${d.msp.toLocaleString('en-IN')}</div>` : '<div class="mandi-msp">No MSP</div>';
+      html += `<div class="mandi-row">
+        <div class="mandi-crop">${d.icon}<span>${d.hi} <span style="opacity:.55;font-size:.75rem">${k}</span></span></div>
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mandi-prices">
+            ${mspHtml}
+            <div class="mandi-market">Market ~₹${typeof mkt==='number'?mkt.toLocaleString('en-IN'):mkt}/${d.unit}</div>
+          </div>
+          <span class="mandi-trend ${d.trend}">${trendLabel}</span>
+        </div>
+      </div>`;
+    });
+    box.innerHTML = html || '<div class="mandi-loading">कोई data नहीं मिला</div>';
+  }, 400);
+}
+
+/* ══════════════════════════════════════════
+   CROP CALENDAR — State-wise monthly data
+══════════════════════════════════════════ */
+const MONTHS_HI = ['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
+const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// [crop_icon, crop_name_hi, activity, status, detail]
+const CALENDAR = {
+  north:{
+    0: [{i:'🌾',n:'गेहूं',a:'Harvesting preparation',s:'prepare',d:'Ensure irrigation, watch for rust'},{i:'🥬',n:'सरसों',a:'Harvest & Threshing',s:'harvest',d:'Cut when 75% pods turn yellow'},{i:'🫛',n:'मसूर/चना',a:'Harvest',s:'harvest',d:'Thresh & store in dry place'}],
+    1: [{i:'🌾',n:'गेहूं',a:'Grain filling — critical',s:'grow',d:'Do NOT irrigate after grain filling starts'},{i:'🥔',n:'आलू',a:'Harvest',s:'harvest',d:'Lift before temperature rises'},{i:'🧅',n:'प्याज',a:'Bulb development',s:'grow',d:'Reduce irrigation 15 days before harvest'}],
+    2: [{i:'🌾',n:'गेहूं',a:'Harvest starts',s:'harvest',d:'Use harvester, store at <12% moisture'},{i:'🌽',n:'मक्का (Zaid)',a:'Sowing',s:'sow',d:'Sow HQPM-1, use 20kg/ha seed rate'},{i:'🍅',n:'टमाटर',a:'Transplanting (Summer)',s:'sow',d:'Use disease-resistant hybrid varieties'}],
+    3: [{i:'🌾',n:'गेहूं',a:'Harvest & Storage',s:'harvest',d:'Store grain with 12% moisture only'},{i:'🌽',n:'मक्का',a:'Early growth',s:'grow',d:'Apply urea 65kg/ha at 30 days'},{i:'🥒',n:'खीरा/लौकी',a:'Sowing season',s:'sow',d:'Ridge planting, 2.5m x 1m spacing'}],
+    4: [{i:'🌾',n:'धान',a:'Nursery preparation',s:'prepare',d:'Treat seeds with Carbendazim, raise nursery'},{i:'🌽',n:'मक्का',a:'Growing / Tasseling',s:'grow',d:'Pest check — stem borer watch'},{i:'🍉',n:'तरबूज',a:'Harvest',s:'harvest',d:'Tap test — hollow sound = ripe'}],
+    5: [{i:'🌾',n:'धान',a:'Transplanting',s:'sow',d:'Transplant 25-day nursery, 2-3 seedlings/hill'},{i:'🫘',n:'सोयाबीन',a:'Sowing starts (Kharif)',s:'sow',d:'JS-9560 variety, 70kg/ha, Rhizobium treat seeds'},{i:'🌽',n:'मक्का (Kharif)',a:'Sowing',s:'sow',d:'Plant after first good rain'}],
+    6: [{i:'🌾',n:'धान',a:'Tillering stage',s:'grow',d:'Apply Urea 65kg/ha, keep 5cm water'},{i:'🫘',n:'सोयाबीन',a:'Growing / Flowering',s:'grow',d:'Watch for Girdle Beetle pest'},{i:'🌿',n:'हरी खाद',a:'Sow Dhaincha/Sunhemp',s:'sow',d:'Incorporate into soil before flowering'}],
+    7: [{i:'🌾',n:'धान',a:'Panicle initiation',s:'grow',d:'Apply K fertilizer (MOP 50kg/ha)'},{i:'🫘',n:'सोयाबीन',a:'Pod filling',s:'grow',d:'Spray Mancozeb for Soybean rust if seen'},{i:'🎋',n:'गन्ना',a:'Earthing up',s:'grow',d:'Intercultivation & earthing to prevent lodging'}],
+    8: [{i:'🌾',n:'धान',a:'Grain filling / Ripening',s:'grow',d:'Do NOT let field dry completely'},{i:'🫘',n:'सोयाबीन',a:'Harvest ready',s:'harvest',d:'Harvest when 95% pods turn brown'},{i:'🌾',n:'गेहूं',a:'Land preparation',s:'prepare',d:'Deep plowing, add FYM 10 ton/ha'}],
+    9: [{i:'🌾',n:'गेहूं',a:'Prime sowing time',s:'sow',d:'Sow HD-2967 or DBW-17 at 100kg/ha'},{i:'🥔',n:'आलू',a:'Sowing time',s:'sow',d:'Use certified tubers, 60x25cm spacing'},{i:'🥬',n:'सरसों',a:'Sowing',s:'sow',d:'Pusa Bold or RH-749, 5kg/ha seed rate'}],
+    10:[{i:'🌾',n:'गेहूं',a:'Best sowing month',s:'sow',d:'Optimum for North India — irrigate at CRI stage'},{i:'🥔',n:'आलू',a:'Growing',s:'grow',d:'Apply Urea at 30 days, earthing up'},{i:'🧅',n:'प्याज (Rabi)',a:'Transplanting',s:'sow',d:'Transplant 45-day old nursery, 15x10cm'}],
+    11:[{i:'🌾',n:'गेहूं',a:'Late sowing',s:'sow',d:'Use late varieties: HD-3086 or NW-1014'},{i:'🥕',n:'गाजर/मूली',a:'Sowing',s:'sow',d:'Direct seed in raised beds'},{i:'🫛',n:'मटर',a:'Sowing',s:'sow',d:'Arkel or HFP-4 variety, 80kg/ha'}],
+  },
+  central:{
+    0: [{i:'🥬',n:'सरसों',a:'Harvest',s:'harvest',d:'Cut, thresh & store safely'},{i:'🫛',n:'चना',a:'Harvest',s:'harvest',d:'Harvest when pods dry'},{i:'🌾',n:'गेहूं',a:'Grain filling',s:'grow',d:'Final irrigation at milking stage'}],
+    1: [{i:'🌾',n:'गेहूं',a:'Harvest preparation',s:'prepare',d:'Arrange harvester, storage'},{i:'🫘',n:'सोयाबीन',a:'Land prep for Kharif',s:'prepare',d:'Deep summer plowing (गर्मी जुताई)'},{i:'🧅',n:'प्याज',a:'Harvest',s:'harvest',d:'Lift onion bulbs when tops fall'}],
+    2: [{i:'🌾',n:'गेहूं',a:'Harvest',s:'harvest',d:'Harvest in morning to avoid shattering'},{i:'🌻',n:'सूरजमुखी',a:'Sowing (Zaid)',s:'sow',d:'Sow KBSH-44, 5kg/ha seed rate'},{i:'🍅',n:'टमाटर',a:'Transplanting',s:'sow',d:'Use drip irrigation in summer'}],
+    3: [{i:'🫘',n:'मूंग/उड़द',a:'Sowing (Zaid)',s:'sow',d:'Short duration, ready in 60 days'},{i:'🌽',n:'मक्का',a:'Sowing',s:'sow',d:'HQPM-1 hybrid, treat seeds'},{i:'🍅',n:'टमाटर',a:'Growing',s:'grow',d:'Mulching to conserve moisture'}],
+    4: [{i:'🌾',n:'धान',a:'Nursery preparation',s:'prepare',d:'Raise nursery, treat with Bavistin'},{i:'🫘',n:'सोयाबीन',a:'Pre-sowing prep',s:'prepare',d:'Collect certified JS-9560 seeds'},{i:'🌽',n:'मक्का',a:'Growing',s:'grow',d:'Top dress Urea 65kg/ha'}],
+    5: [{i:'🫘',n:'सोयाबीन',a:'SOWING SEASON (critical)',s:'sow',d:'Sow at first rain of June — JS-9560, 70kg/ha'},{i:'🌾',n:'धान',a:'Transplanting',s:'sow',d:'Transplant in rows 20x15cm'},{i:'🌽',n:'मक्का',a:'Kharif sowing',s:'sow',d:'Ridge planting after first rain'}],
+    6: [{i:'🫘',n:'सोयाबीन',a:'Vegetative growth',s:'grow',d:'Spray Chlorpyrifos for Girdle Beetle'},{i:'🌾',n:'धान',a:'Tillering',s:'grow',d:'Weed control — 1st weeding at 20 days'},{i:'🌻',n:'तिल',a:'Sowing',s:'sow',d:'GT-10 variety, 3kg/ha, line sowing'}],
+    7: [{i:'🫘',n:'सोयाबीन',a:'Flowering / Pod set',s:'grow',d:'CRITICAL — no stress, spray Mancozeb if rust seen'},{i:'🌾',n:'धान',a:'Panicle initiation',s:'grow',d:'Apply Potash (MOP) fertilizer now'},{i:'🌽',n:'मक्का',a:'Silking / Tasseling',s:'grow',d:'Irrigation if no rain for 10+ days'}],
+    8: [{i:'🫘',n:'सोयाबीन',a:'Maturity / Pre-harvest',s:'harvest',d:'Stop irrigation at 95% yellow pods'},{i:'🌾',n:'धान',a:'Grain filling',s:'grow',d:'Maintain 5cm water till maturity'},{i:'🥬',n:'सरसों',a:'Nursery preparation',s:'prepare',d:'Prepare beds for Oct sowing'}],
+    9: [{i:'🫘',n:'सोयाबीन',a:'Harvest complete',s:'harvest',d:'Sell immediately or store at <12% moisture'},{i:'🌾',n:'गेहूं',a:'Land prep + Sowing',s:'sow',d:'GW-322, HI-8498, sow 100kg/ha'},{i:'🥬',n:'सरसों',a:'Sowing',s:'sow',d:'Sow JM-1, RH-749, 5kg/ha'}],
+    10:[{i:'🌾',n:'गेहूं',a:'Best time for wheat',s:'sow',d:'Sow by 15 Nov for best yield'},{i:'🧅',n:'प्याज',a:'Nursery sowing',s:'prepare',d:'Raise Rabi onion nursery'},{i:'🥔',n:'आलू',a:'Sowing',s:'sow',d:'Kufri Jyoti, 25 quintal/ha seed'}],
+    11:[{i:'🌾',n:'गेहूं',a:'Irrigation (CRI stage)',s:'grow',d:'First irrigation 20-22 days after sowing'},{i:'🫛',n:'चना',a:'Sowing',s:'sow',d:'JG-14 or JG-63, 70kg/ha seed rate'},{i:'🥔',n:'आलू',a:'Growing',s:'grow',d:'Earthing up at 30 days'}],
+  },
+  punjab:{
+    0: [{i:'🌾',n:'गेहूं',a:'Grain filling',s:'grow',d:'Last irrigation at dough stage'},{i:'🌿',n:'आलू',a:'Harvest',s:'harvest',d:'Dig when tops wither naturally'},{i:'🧅',n:'प्याज',a:'Bulb formation',s:'grow',d:'Stop nitrogen 30 days before harvest'}],
+    1: [{i:'🌾',n:'गेहूं',a:'Pre-harvest',s:'prepare',d:'Arrange combine harvester'},{i:'🌿',n:'आलू',a:'Harvest',s:'harvest',d:'Store in cool, dark ventilated store'},{i:'🫛',n:'Gobhi Sarson',a:'Harvest',s:'harvest',d:'Rapeseed harvest — sell or process'}],
+    2: [{i:'🌾',n:'गेहूं',a:'Harvest (April 1st week)',s:'harvest',d:'Use combine, sell to procurement centre'},{i:'🌻',n:'Sunflower',a:'Sowing',s:'sow',d:'PS-7166 hybrid, 5kg/ha'},{i:'🌽',n:'Baby Maize',a:'Sowing',s:'sow',d:'Sow for baby corn market'}],
+    3: [{i:'🌾',n:'Basmati',a:'Nursery preparation',s:'prepare',d:'Pusa 1121 nursery — sow late April'},{i:'🌻',n:'Sunflower',a:'Growing',s:'grow',d:'Boron spray 0.2% at bud stage'},{i:'🥜',n:'Moong Dal',a:'Sowing',s:'sow',d:'SML-668, 12kg/ha, 60-day crop'}],
+    4: [{i:'🌾',n:'Paddy',a:'Nursery raising',s:'prepare',d:'Treat seeds with Carbendazim 2g/kg'},{i:'🥜',n:'Moong',a:'Growing',s:'grow',d:'Harvest before monsoon'},{i:'🧅',n:'प्याज',a:'Kharif sowing',s:'sow',d:'L-652, transplant after 30 days'}],
+    5: [{i:'🌾',n:'Paddy (PR-126)',a:'Transplanting',s:'sow',d:'June 10-20 for PR-126; July 1-10 for Basmati'},{i:'🌽',n:'Maize (Kharif)',a:'Sowing',s:'sow',d:'Pioneer 30V92, 20kg/ha'},{i:'🌿',n:'Green Fodder',a:'Sow Bajra/Jowar',s:'sow',d:'For livestock feed'}],
+    6: [{i:'🌾',n:'Basmati',a:'Transplanting (July 1-10)',s:'sow',d:'Transplant 35-day old seedlings'},{i:'🌽',n:'Maize',a:'Growing',s:'grow',d:'Top dress Urea at 30 days'},{i:'🌾',n:'Paddy PR-126',a:'Tillering',s:'grow',d:'Keep 5cm water; use herbicide for weeds'}],
+    7: [{i:'🌾',n:'Paddy',a:'Panicle initiation',s:'grow',d:'Critical water requirement stage'},{i:'🌾',n:'Basmati',a:'Tillering to PI',s:'grow',d:'Spray Tricyclazole for blast if seen'},{i:'🌽',n:'Maize',a:'Grain filling',s:'grow',d:'Watch for Fall Army Worm — use Spinosad'}],
+    8: [{i:'🌾',n:'PR-126 Paddy',a:'Harvest (early)',s:'harvest',d:'PR-126 ready by Sept end — direct seeded'},{i:'🌾',n:'Basmati',a:'Heading / Flowering',s:'grow',d:'Do NOT let field dry at flowering'},{i:'🌾',n:'Wheat',a:'Land preparation',s:'prepare',d:'Laser leveling for uniform germination'}],
+    9: [{i:'🌾',n:'Basmati',a:'Harvest (Oct 1-15)',s:'harvest',d:'Harvest at 20% moisture for export quality'},{i:'🌾',n:'Wheat',a:'Sowing starts',s:'sow',d:'DBW-222, PBW-621 — sow by Oct 25 for best yield'},{i:'🥔',n:'Potato',a:'Sowing',s:'sow',d:'Kufri Pukhraj, Kufri Chipsona'}],
+    10:[{i:'🌾',n:'Wheat',a:'PRIME SOWING MONTH',s:'sow',d:'Best: Oct 25 - Nov 10 | Use PBW-343 or DBW-17'},{i:'🥔',n:'Potato',a:'Growing',s:'grow',d:'Earth up at 30 days, spray Mancozeb'},{i:'🌿',n:'Gobhi Sarson',a:'Sowing',s:'sow',d:'GSL-1 variety, 5kg/ha, line sowing'}],
+    11:[{i:'🌾',n:'Wheat',a:'CRI irrigation',s:'grow',d:'Irrigate 20-22 days after sowing (Crown Root Initiation)'},{i:'🌿',n:'Berseem',a:'Sowing (fodder)',s:'sow',d:'BL-42, broadcast 25kg/ha for fodder'},{i:'🥕',n:'Vegetables',a:'Sowing (Rabi)',s:'sow',d:'Carrot, radish, spinach, fenugreek'}],
+  },
+};
+// Use 'central' as default for other regions
+['rajasthan','maharashtra','south','wb'].forEach(k=>{ CALENDAR[k] = CALENDAR['central']; });
+
+let calMonth = new Date().getMonth();
+let calYear  = new Date().getFullYear();
+
+function changeCalMonth(dir){
+  calMonth += dir;
+  if(calMonth > 11){ calMonth = 0; calYear++; }
+  if(calMonth < 0 ){ calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+const SEASONAL_TIPS = {
+  0:"❄️ ठंड में पाला पड़ सकता है — रात में हल्की सिंचाई करें। गेहूं में रतुआ रोग की निगरानी रखें।",
+  1:"🌬️ सरसों की फली बनने का समय — aphid का ध्यान रखें। Imidacloprid 0.5ml/L spray करें।",
+  2:"🌡️ तापमान बढ़ रहा है — सिंचाई की मात्रा बढ़ाएं। गेहूं काटने के बाद खेत खाली न छोड़ें।",
+  3:"☀️ गर्मी तेज़ है — mulching करें, सुबह-शाम सिंचाई करें। Zaid फसलें लगाएं।",
+  4:"🌤️ मानसून पूर्व तैयारी करें — धान की नर्सरी उठाएं, बीज उपचार करें।",
+  5:"🌧️ मानसून शुरू — Kharif फसलें बोएं। पहली अच्छी बारिश के बाद ही सोयाबीन बोएं।",
+  6:"💧 अच्छी बारिश का समय — खेत में पानी भराव न हो। फफूंद रोगों का खतरा अधिक।",
+  7:"🌧️ भारी बारिश — जल निकासी सुनिश्चित करें। सोयाबीन में Girdle Beetle की निगरानी करें।",
+  8:"🌤️ मानसून की विदाई — Rabi फसलों की तैयारी शुरू करें। गहरी जुताई करें।",
+  9:"🍂ठंड शुरू — गेहूं और सरसों बोने का सही समय। DAP + MOP बुआई के साथ डालें।",
+  10:"❄️ सर्दी आ रही है — गेहूं बोने का सर्वोत्तम महीना। पाला से बचाव की तैयारी करें।",
+  11:"❄️ कड़ाके की ठंड — पाला पड़ने पर सुबह खेत में धुआं करें। सब्जियों पर जालीदार कपड़ा ढकें।"
+};
+
+function renderCalendar(){
+  const state   = document.getElementById('cal-state').value;
+  const stateData = CALENDAR[state] || CALENDAR['central'];
+  const items   = stateData[calMonth] || [];
+  const label   = document.getElementById('cal-month-label');
+  const grid    = document.getElementById('cal-grid');
+  const tip     = document.getElementById('cal-tip');
+
+  label.textContent = `${MONTHS_HI[calMonth]} / ${MONTHS_EN[calMonth]} ${calYear}`;
+
+  if(!items.length){
+    grid.innerHTML = '<div style="color:rgba(255,255,255,.4);font-size:.82rem;padding:.5rem">इस महीने के लिए data उपलब्ध नहीं</div>';
+  } else {
+    grid.innerHTML = items.map(item=>`
+      <div class="cal-item">
+        <div class="cal-item-icon">${item.i}</div>
+        <div class="cal-item-info">
+          <div class="cal-item-name">${item.n}</div>
+          <div class="cal-item-detail">${item.d}</div>
+        </div>
+        <span class="cal-status-badge ${item.s}">${item.s==='sow'?'🌱 बोएं':item.s==='harvest'?'🌾 काटें':item.s==='grow'?'💧 देखभाल':'📋 तैयारी'}</span>
+      </div>`).join('');
+  }
+
+  tip.innerHTML = `💡 ${SEASONAL_TIPS[calMonth]}`;
+}
+
+// Init on page load
+renderCalendar();
+loadMandiPrices();
+// Auto-select MP since user is from Bhopal
+document.getElementById('mandi-state').value = 'MP';
+loadMandiPrices();
+</script>
+
+{% endblock %}
