@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🌿 LeafScan AI — Plant Disease Detection
 
 A full-stack Flask web app that uses your trained VGG-16 model to detect plant diseases from leaf photos in real-time.
@@ -114,3 +115,6 @@ gunicorn -w 4 -b 0.0.0.0:5000 app:app
 ```
 
 Or use Render, Railway, or any Python hosting platform.
+=======
+# leafscan-ai
+>>>>>>> 48e77b49c4a4f47df2d576984d7c518cd0bf3059
